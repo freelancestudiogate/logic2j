@@ -221,6 +221,32 @@ public class TermApi {
         return TermApi.assignIndexes(theTerm, (short) 0); // Start assigning indexes with zero
     }
 
+    /**
+     * This is an internal template method: the public API entry point is {@link TermApi#substitute(Term, Bindings, IdentityHashMap)}; see a
+     * more detailed description there.
+     * 
+     * @param theBindings
+     * @param theBindingsToVars
+     * @return An equivalent Term with all bound variables pointing to literals, this implies a deep cloning of substructures that contain
+     *         variables. When no variables are bound, then the same refernce is returned. Important note: the caller cannot know if the
+     *         returned reference was cloned or not, so it must never mutate it!
+     */
+    public static Term substitute(Term theTerm, Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
+        if ((theTerm instanceof Struct && theTerm.index == 0) || theBindings.isEmpty()) {
+            // No variables identified in the term, or no variables passed as argument: do not need to substitute
+            return theTerm;
+        }
+        if (theTerm instanceof Struct) {
+            return ((Struct) theTerm).substitute(theBindings, theBindingsToVars);
+        } else if (theTerm instanceof Var) {
+            return ((Var) theTerm).substitute(theBindings, theBindingsToVars);
+        } else if (theTerm instanceof TNumber) {
+            return ((TNumber) theTerm).substitute(theBindings, theBindingsToVars);
+        } else {
+            throw new PrologNonSpecificError("Should not happen here");
+        }
+    }
+
     // TODO Currently unused - but probably we should
     void avoidCycle(Struct theClause) {
         final List<Term> visited = new ArrayList<Term>(20);
@@ -241,26 +267,6 @@ public class TermApi {
             ((Struct) factorized).assignPrimitiveInfo(theLibraryContent);
         }
         return factorized;
-    }
-
-    /**
-     * Substitute, recursively, any bound {@link Var}s to their actual values. This delegates the call to
-     * {@link Term#substitute(Bindings, IdentityHashMap)}.
-     * 
-     * @param theTerm
-     * @param theBindings
-     * @param theBindingsToVars
-     * @return An equivalent Term with all bound variables pointing to literals, this implies a deep cloning of substructures that contain
-     *         variables. When no variables are bound, then the same refernce is returned. Important note: the caller cannot know if the
-     *         returned reference was cloned or not, so it must never mutate it!
-     */
-    public Term substitute(Term theTerm, final Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) throws InvalidTermException {
-        if ((theTerm instanceof Struct && theTerm.index == 0) || theBindings.isEmpty()) {
-            // No variables identified in the term, or no variables passed as argument: do not need to substitute
-            return theTerm;
-        }
-        // Delegate to actual subclass of Term
-        return theTerm.substitute(theBindings, theBindingsToVars);
     }
 
     /**

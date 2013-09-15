@@ -125,8 +125,7 @@ public final class Var extends Term {
         return null;
     }
 
-    @Override
-    protected Term substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
+    Term substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
         if (isAnonymous()) {
             // Anonymous variable is never bound - won't substitute
             return this;
@@ -136,7 +135,7 @@ public final class Var extends Term {
             // For a literal, we have a reference to the literal term and to its
             // own variables,
             // so recurse further
-            return binding.getTerm().substitute(binding.getLiteralBindings(), theBindingsToVars);
+            return TermApi.substitute(binding.getTerm(), binding.getLiteralBindings(), theBindingsToVars);
         }
         if (binding.isFree()) {
             // Free variable has no value, so substitution ends up on the last

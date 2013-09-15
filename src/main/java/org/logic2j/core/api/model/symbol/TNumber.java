@@ -70,8 +70,7 @@ public abstract class TNumber extends Term implements Comparable<TNumber> {
     /**
      * No substitution occurs on literals.
      */
-    @Override
-    protected Term substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
+    Term substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
         return this;
     }
 

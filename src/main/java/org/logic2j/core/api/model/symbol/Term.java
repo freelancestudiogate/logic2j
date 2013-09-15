@@ -19,7 +19,6 @@ package org.logic2j.core.api.model.symbol;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.IdentityHashMap;
 
 import org.logic2j.core.api.TermExchanger;
 import org.logic2j.core.api.model.TermVisitor;
@@ -86,16 +85,6 @@ public abstract class Term implements Serializable, Cloneable {
     // Graph traversal methods, template methods with "protected" scope, user code should use TermApi methods instead.
     // Some traversal are implemented by the Visitor design pattern and the #accept() method
     // ---------------------------------------------------------------------------
-
-    /**
-     * This is an internal template method: the public API entry point is {@link TermApi#substitute(Term, Bindings, IdentityHashMap)}; see a
-     * more detailed description there.
-     * 
-     * @param theBindings
-     * @param theBindingsToVars
-     * @return A possibly new (cloned) term with all non-free bindings resolved.
-     */
-    protected abstract Term substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars);
 
     /**
      * Find the first {@link Term} that is either same, or structurally equal to this.

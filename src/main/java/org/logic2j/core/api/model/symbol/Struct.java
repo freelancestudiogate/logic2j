@@ -395,13 +395,12 @@ public final class Struct extends Term {
     /**
      * If any argument appears to have been cloned, then the complete structure will be cloned.
      */
-    @Override
-    protected Term substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
+    Term substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
         final Term[] substArgs = new Term[this.arity]; // All arguments after
                                                        // substitution
         boolean anyChange = false;
         for (int i = 0; i < this.arity; i++) {
-            substArgs[i] = this.args[i].substitute(theBindings, theBindingsToVars);
+            substArgs[i] = TermApi.substitute(this.args[i], theBindings, theBindingsToVars);
             anyChange |= (substArgs[i] != this.args[i]);
         }
         final Struct substituted;

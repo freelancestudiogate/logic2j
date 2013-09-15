@@ -286,7 +286,7 @@ public class Bindings {
                             + " can't be assigned a variable name");
                 }
                 final Term boundTerm = finalBinding.getTerm();
-                final Term substitute = TERM_API.substitute(boundTerm, finalBinding.getLiteralBindings(), bindingToInitialVar);
+                final Term substitute = TermApi.substitute(boundTerm, finalBinding.getLiteralBindings(), bindingToInitialVar);
                 // Literals are not unbound terms, they are returned the same way for all types of representations asked
                 result.put(originalVarName, substitute);
                 break;
