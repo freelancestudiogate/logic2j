@@ -85,16 +85,6 @@ public abstract class Term implements Serializable, Cloneable {
      */
     public abstract boolean isList();
 
-    /**
-     * Check structural equality, this means that the names of atoms, functors, arity and numeric values are all equal, that the same
-     * variables are referred to, but irrelevant of the bound values of those variables.
-     * 
-     * @param theOther
-     * @return true when theOther is structurally equal to this. Same references (==) will always yield true.
-     */
-    // TODO we only need the "public" scope for Unit Tests, this is not ideal
-    public abstract boolean structurallyEquals(Term theOther);
-
     public abstract <T> T accept(TermVisitor<T> theVisitor);
 
     // ---------------------------------------------------------------------------
@@ -122,14 +112,6 @@ public abstract class Term implements Serializable, Cloneable {
     protected abstract Term substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars);
 
     /**
-     * Find the first instance of {@link Var} by name inside a Term, most often a {@link Struct}.
-     * 
-     * @param theVariableName
-     * @return A {@link Var} with the specified name, or null when not found.
-     */
-    public abstract Var findVar(String theVariableName);
-
-    /**
      * Find the first {@link Term} that is either same, or structurally equal to this.
      * 
      * @param findWithin
@@ -137,7 +119,7 @@ public abstract class Term implements Serializable, Cloneable {
      */
     protected Term findStructurallyEqualWithin(Collection<Term> findWithin) {
         for (final Term term : findWithin) {
-            if (term != this && term.structurallyEquals(this)) {
+            if (term != this && TermApi.structurallyEquals(term, this)) {
                 return term;
             }
         }

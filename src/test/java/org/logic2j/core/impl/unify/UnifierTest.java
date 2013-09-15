@@ -279,14 +279,14 @@ public class UnifierTest extends PrologTestBase {
 
     public void assertStaticallyEquals(CharSequence expectedStr, Term theActual) {
         final Term theExpected = this.prolog.getTermExchanger().unmarshall(expectedStr);
-        if (!theExpected.structurallyEquals(theActual)) {
+        if (!TermApi.structurallyEquals(theExpected, theActual)) {
             assertEquals("Terms are not structurally equal", theExpected.toString(), theActual.toString());
             fail("Terms are not structurally equal yet strangely their toString are the same");
         }
     }
 
     public static void assertStaticallyEquals(Term theExpected, Term theActual) {
-        if (!theExpected.structurallyEquals(theActual)) {
+        if (!TermApi.structurallyEquals(theExpected, theActual)) {
             assertEquals("Terms are not structurally equal", theExpected.toString(), theActual.toString());
             fail("Terms are not structurally equal yet strangely their toString are the same");
         }

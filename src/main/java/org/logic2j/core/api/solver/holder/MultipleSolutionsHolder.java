@@ -27,6 +27,7 @@ import org.logic2j.core.api.model.Continuation;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Term;
+import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Bindings;
 import org.logic2j.core.api.model.var.Bindings.FreeVarRepresentation;
@@ -83,7 +84,7 @@ public class MultipleSolutionsHolder {
             public Continuation onSolution() {
                 final Bindings bnd = originalBindings;
                 final Term term = bnd.getReferrer();
-                final Var var = term.findVar(theVariableName);
+                final Var var = TermApi.findVar(term, theVariableName);
                 if (var == null) {
                     throw new InvalidTermException("No variable named \"" + theVariableName + "\" in " + term);
                 }

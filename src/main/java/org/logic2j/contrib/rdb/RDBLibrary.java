@@ -44,6 +44,7 @@ import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Term;
+import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Bindings;
 import org.logic2j.core.api.solver.listener.UniqueSolutionListener;
@@ -281,7 +282,7 @@ public class RDBLibrary extends LibraryBase {
             Bindings originalBindings = null;
             int counter = 0;
             for (final Var var : projectVars) {
-                final Var originalVar = conditions.findVar(var.getName());
+                final Var originalVar = TermApi.findVar(conditions, var.getName());
                 if (originalVar == null) {
                     throw new InvalidTermException("Could no find original var " + var.getName() + " within " + conditions);
                 }

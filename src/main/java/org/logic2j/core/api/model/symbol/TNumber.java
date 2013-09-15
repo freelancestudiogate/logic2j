@@ -68,8 +68,7 @@ public abstract class TNumber extends Term implements Comparable<TNumber> {
         return this;
     }
 
-    @Override
-    public Var findVar(String theVariableName) {
+    Var findVar(String theVariableName) {
         return null;
     }
 
@@ -85,8 +84,7 @@ public abstract class TNumber extends Term implements Comparable<TNumber> {
      * @param theOther
      * @return true when references are the same, or when values represented by the associated numbers are the same.
      */
-    @Override
-    public boolean structurallyEquals(Term theOther) {
+    boolean structurallyEquals(Term theOther) {
         if (theOther == this) {
             return true; // Same reference
         }

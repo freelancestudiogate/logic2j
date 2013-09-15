@@ -381,11 +381,10 @@ public final class Struct extends Term {
         return factorized;
     }
 
-    @Override
-    public Var findVar(String theVariableName) {
+    Var findVar(String theVariableName) {
         for (int i = 0; i < this.arity; i++) {
             final Term term = this.args[i];
-            final Var found = term.findVar(theVariableName);
+            final Var found = TermApi.findVar(term, theVariableName);
             if (found != null) {
                 return found;
             }
@@ -420,8 +419,7 @@ public final class Struct extends Term {
      * @param theOther
      * @return true when references are the same, or when theOther Struct has same predicate name, arity, and all arguments are also equal.
      */
-    @Override
-    public boolean structurallyEquals(Term theOther) {
+    boolean structurallyEquals(Term theOther) {
         if (theOther == this) {
             return true; // Same reference
         }
@@ -432,7 +430,7 @@ public final class Struct extends Term {
         // Arity and names must match.
         if (this.arity == that.arity && this.name == that.name) { // Names are {@link String#intern()}alized so OK to check by reference
             for (int i = 0; i < this.arity; i++) {
-                if (!this.args[i].structurallyEquals(that.args[i])) {
+                if (!TermApi.structurallyEquals(this.args[i], that.args[i])) {
                     return false;
                 }
             }

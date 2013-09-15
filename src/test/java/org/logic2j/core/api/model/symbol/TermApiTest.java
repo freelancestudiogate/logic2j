@@ -52,12 +52,12 @@ public class TermApiTest {
         // ... even when they have the same name
         assertFalse(x1.structurallyEquals(x2));
         final Struct s = new Struct("s", x1, x2);
-        assertFalse(s.getArg(0).structurallyEquals(s.getArg(1)));
+        assertFalse(TermApi.structurallyEquals(s.getArg(0), s.getArg(1)));
         // After factorization, the 2 X will be same
         final Struct s2 = (Struct) TERM_API.factorize(s);
         assertNotSame(s, s2);
         assertFalse(s.structurallyEquals(s2));
-        assertTrue(s2.getArg(0).structurallyEquals(s2.getArg(1)));
+        assertTrue(TermApi.structurallyEquals(s2.getArg(0), s2.getArg(1)));
     }
 
     // TODO (issue) Check this more carefully, see https://github.com/ltettoni/logic2j/issues/13

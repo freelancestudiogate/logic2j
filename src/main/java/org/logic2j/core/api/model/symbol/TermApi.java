@@ -92,6 +92,8 @@ public class TermApi {
             ((Var) theTerm).collectTermsInto(collection);
         } else if (theTerm instanceof TNumber) {
             ((TNumber) theTerm).collectTermsInto(collection);
+        } else {
+            throw new PrologNonSpecificError("Should not happen here");
         }
     }
 
@@ -138,8 +140,46 @@ public class TermApi {
             return ((Var) theTerm).factorize(collection);
         } else if (theTerm instanceof TNumber) {
             return ((TNumber) theTerm).factorize(collection);
+        } else {
+            throw new PrologNonSpecificError("Should not happen here");
         }
-        throw new PrologNonSpecificError("Should not happen here");
+    }
+
+    /**
+     * Check structural equality, this means that the names of atoms, functors, arity and numeric values are all equal, that the same
+     * variables are referred to, but irrelevant of the bound values of those variables.
+     * 
+     * @param theOther
+     * @return true when theOther is structurally equal to this. Same references (==) will always yield true.
+     */
+    public static boolean structurallyEquals(Term theTerm, Term theOther) {
+        if (theTerm instanceof Struct) {
+            return ((Struct) theTerm).structurallyEquals(theOther);
+        } else if (theTerm instanceof Var) {
+            return ((Var) theTerm).structurallyEquals(theOther);
+        } else if (theTerm instanceof TNumber) {
+            return ((TNumber) theTerm).structurallyEquals(theOther);
+        } else {
+            throw new PrologNonSpecificError("Should not happen here");
+        }
+    }
+
+    /**
+     * Find the first instance of {@link Var} by name inside a Term, most often a {@link Struct}.
+     * 
+     * @param theVariableName
+     * @return A {@link Var} with the specified name, or null when not found.
+     */
+    public static Var findVar(Term theTerm, String theVariableName) {
+        if (theTerm instanceof Struct) {
+            return ((Struct) theTerm).findVar(theVariableName);
+        } else if (theTerm instanceof Var) {
+            return ((Var) theTerm).findVar(theVariableName);
+        } else if (theTerm instanceof TNumber) {
+            return ((TNumber) theTerm).findVar(theVariableName);
+        } else {
+            throw new PrologNonSpecificError("Should not happen here");
+        }
     }
 
     // TODO Currently unused - but probably we should

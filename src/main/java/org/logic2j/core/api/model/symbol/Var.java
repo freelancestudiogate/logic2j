@@ -120,8 +120,7 @@ public final class Var extends Term {
         return false;
     }
 
-    @Override
-    public Var findVar(String theVariableName) {
+    Var findVar(String theVariableName) {
         if (ANONYMOUS_VAR_NAME.equals(theVariableName)) {
             throw new PrologInternalError("Cannot find the anonymous variable");
         }
@@ -195,8 +194,7 @@ public final class Var extends Term {
      * @return true only when references are the same, otherwise two distinct {@link Var}s will always be considered different, despite
      *         their name, index, or whatever.
      */
-    @Override
-    public boolean structurallyEquals(Term theOther) {
+    boolean structurallyEquals(Term theOther) {
         return theOther == this; // Check memory reference only
     }
 
