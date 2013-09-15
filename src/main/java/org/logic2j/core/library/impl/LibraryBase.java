@@ -25,7 +25,6 @@ import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Term;
-import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Binding;
 import org.logic2j.core.api.model.var.Bindings;
@@ -37,7 +36,6 @@ import org.logic2j.core.library.mgmt.PrimitiveInfo.PrimitiveType;
  * Base class for libraries.
  */
 public class LibraryBase implements PLibrary {
-    protected static final TermApi TERM_API = new TermApi();
     private final PrologImplementation prolog;
 
     public LibraryBase(PrologImplementation theProlog) {

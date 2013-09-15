@@ -32,8 +32,6 @@ import org.logic2j.core.api.model.var.Bindings.FreeVarRepresentation;
 class UnificationTester {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(UnificationTester.class);
 
-    private static final TermApi TERM_API = new TermApi();
-
     private final Unifier unifier;
 
     public Term left;
@@ -59,8 +57,8 @@ class UnificationTester {
      * @param theRight
      */
     private void init2(Term theLeft, Term theRight) {
-        this.left = TERM_API.normalize(theLeft, null);
-        this.right = TERM_API.normalize(theRight, null);
+        this.left = TermApi.normalize(theLeft, null);
+        this.right = TermApi.normalize(theRight, null);
         this.leftVars = new Bindings(this.left);
         this.rightVars = new Bindings(this.right);
     }
@@ -73,8 +71,8 @@ class UnificationTester {
      * @param bindings
      */
     private void init1(Term theLeft, Term theRight, Bindings bindings) {
-        this.left = TERM_API.normalize(theLeft, null);
-        this.right = TERM_API.normalize(theRight, null);
+        this.left = TermApi.normalize(theLeft, null);
+        this.right = TermApi.normalize(theRight, null);
         this.leftVars = bindings;
         this.rightVars = bindings;
     }
@@ -90,8 +88,8 @@ class UnificationTester {
         logger.debug(" result={}", unified);
         logger.debug(" leftVars={}", this.leftVars);
         logger.debug(" rightVars={}", this.rightVars);
-        logger.debug(" left={}   bindings={}", TERM_API.substitute(this.left, this.leftVars, null), this.leftVars.explicitBindings(FreeVarRepresentation.SKIPPED));
-        logger.debug(" right={}  bindings={}", TERM_API.substitute(this.right, this.rightVars, null), this.rightVars.explicitBindings(FreeVarRepresentation.SKIPPED));
+        logger.debug(" left={}   bindings={}", TermApi.substitute(this.left, this.leftVars, null), this.leftVars.explicitBindings(FreeVarRepresentation.SKIPPED));
+        logger.debug(" right={}  bindings={}", TermApi.substitute(this.right, this.rightVars, null), this.rightVars.explicitBindings(FreeVarRepresentation.SKIPPED));
         appendSignature(theSignature, this.leftVars, this.rightVars);
         this.result = unified;
         if (this.expectedResult != null) {
@@ -111,8 +109,8 @@ class UnificationTester {
         logger.info("Unifying {} to {}", this.right, this.left);
         final boolean unified = this.unifier.unify(this.right, this.rightVars, this.left, this.leftVars);
         logger.debug(" result={}", unified);
-        logger.debug(" left={}   bindings={}", TERM_API.substitute(this.left, this.leftVars, null), this.leftVars.explicitBindings(FreeVarRepresentation.SKIPPED));
-        logger.debug(" right={}  bindings={}", TERM_API.substitute(this.right, this.rightVars, null), this.rightVars.explicitBindings(FreeVarRepresentation.SKIPPED));
+        logger.debug(" left={}   bindings={}", TermApi.substitute(this.left, this.leftVars, null), this.leftVars.explicitBindings(FreeVarRepresentation.SKIPPED));
+        logger.debug(" right={}  bindings={}", TermApi.substitute(this.right, this.rightVars, null), this.rightVars.explicitBindings(FreeVarRepresentation.SKIPPED));
         appendSignature(theSignature, this.leftVars, this.rightVars);
         this.result = unified;
         if (this.expectedResult != null) {

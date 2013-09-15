@@ -100,7 +100,7 @@ public class RDBLibrary extends LibraryBase {
         Term internalGoal = Struct.valueOf("gd3_solve", conditions, resultVar);
         internalGoal = internalGoal.cloneIt();
         // Watch out this destroys the indexes in the original expression !!!!
-        internalGoal = TERM_API.normalize(internalGoal, getProlog().getLibraryManager().wholeContent());
+        internalGoal = TermApi.normalize(internalGoal, getProlog().getLibraryManager().wholeContent());
         final Bindings internalBindings = new Bindings(internalGoal);
         final UniqueSolutionListener internalListener = new UniqueSolutionListener(internalBindings);
         getProlog().getSolver().solveGoal(internalBindings, internalListener);
@@ -124,8 +124,8 @@ public class RDBLibrary extends LibraryBase {
                 }
                 // Operator
                 else if (ALLOWED_OPERATORS.contains(functor)) {
-                    final Term term1 = TERM_API.selectTerm(pred, "[1]", Term.class);
-                    final Term term2 = TERM_API.selectTerm(pred, "[2]", Term.class);
+                    final Term term1 = TermApi.selectTerm(pred, "[1]", Term.class);
+                    final Term term2 = TermApi.selectTerm(pred, "[2]", Term.class);
                     final String variableName;
                     final Term value;
                     if (term1 instanceof Var && !(term2 instanceof Var)) {
@@ -172,12 +172,12 @@ public class RDBLibrary extends LibraryBase {
                     throw new InvalidTermException("Arity of term " + tbl + " must be 4 or 5");
                 }
                 // Convert this predicate into a Criterion. When variables are specified, use the var as the operand value
-                final String tableName = TERM_API.selectTerm(tbl, "tbl[1]", Struct.class).getName();
-                final String columnName = TERM_API.selectTerm(tbl, "tbl[2]", Struct.class).getName();
-                final Term valueTerm = TERM_API.selectTerm(tbl, "tbl[4]", Term.class);
+                final String tableName = TermApi.selectTerm(tbl, "tbl[1]", Struct.class).getName();
+                final String columnName = TermApi.selectTerm(tbl, "tbl[2]", Struct.class).getName();
+                final Term valueTerm = TermApi.selectTerm(tbl, "tbl[4]", Term.class);
                 String operator = SqlBuilder3.OPERATOR_EQ_OR_IN;
                 if (tbl.getArity() >= 5) {
-                    operator = TERM_API.selectTerm(tbl, "tbl[5]", Struct.class).getName();
+                    operator = TermApi.selectTerm(tbl, "tbl[5]", Struct.class).getName();
                 }
                 final Table table = builder.table(tableName, alias);
                 final Column sqlColumn = builder.column(table, columnName);

@@ -111,10 +111,9 @@ public class DefaultLibraryManager implements LibraryManager {
         // It's actually unclear if when we load a new library, the new available functors would influence theories currently loaded.
 
         // We need to assignPrimitiveInfo(), but let's use the TermApi directly and invoke normalize() it won't harm to do a little more.
-        final TermApi termApi = new TermApi();
-        termApi.normalize(Struct.ATOM_TRUE, this.wholeContent);
-        termApi.normalize(Struct.ATOM_FALSE, this.wholeContent);
-        termApi.normalize(Struct.ATOM_CUT, this.wholeContent);
+        TermApi.normalize(Struct.ATOM_TRUE, this.wholeContent);
+        TermApi.normalize(Struct.ATOM_FALSE, this.wholeContent);
+        TermApi.normalize(Struct.ATOM_CUT, this.wholeContent);
     }
 
     /**

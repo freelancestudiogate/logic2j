@@ -129,12 +129,6 @@ public abstract class Term implements Serializable, Cloneable {
         }
     }
 
-    @Override
-    public abstract boolean equals(Object that);
-
-    @Override
-    public abstract int hashCode();
-
     /**
      * Delegate formatting to our basic {@link TermExchanger}.
      */

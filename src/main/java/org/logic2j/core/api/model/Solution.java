@@ -34,7 +34,6 @@ import org.logic2j.core.api.model.var.Bindings.FreeVarRepresentation;
  * a(Y, 3)) , {@link #getBindings()}=={X -> 2, Y -> null, Z -> 3} , {@link #getBinding(String)}==2 when argument is "X".
  */
 public class Solution {
-    private static final TermApi TERM_API = new TermApi();
 
     /**
      * @see #getSolution()
@@ -56,7 +55,7 @@ public class Solution {
      * @param theBindings
      */
     public Solution(Bindings theBindings) {
-        this.solution = TERM_API.substitute(theBindings.getReferrer(), theBindings, null);
+        this.solution = TermApi.substitute(theBindings.getReferrer(), theBindings, null);
         this.bindings = theBindings.explicitBindings(FreeVarRepresentation.NULL);
     }
 

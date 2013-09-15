@@ -48,8 +48,6 @@ public class Bindings {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Bindings.class);
     private static boolean isDebug = logger.isDebugEnabled();
 
-    private static final TermApi TERM_API = new TermApi();
-
     /**
      * The Term, usually a {@link Struct}, whose {@link Var}iables refer to this {@link Bindings} through their indexes.
      */

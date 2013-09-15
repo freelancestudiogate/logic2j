@@ -31,7 +31,6 @@ import org.logic2j.core.api.model.symbol.TermApi;
  */
 public class DefaultTermAdapter implements TermAdapter {
 
-    private static final TermApi TERM_API = new TermApi();
     protected final PrologImplementation prolog;
 
     public DefaultTermAdapter(PrologImplementation theProlog) {
@@ -49,7 +48,7 @@ public class DefaultTermAdapter implements TermAdapter {
             throw new UnsupportedOperationException("TermAdapter cannot parse complex CharSequences, use TermExchanger instead");
         }
         final Term created = termFrom(theObject, theMode);
-        final Term normalized = TERM_API.normalize(created, this.prolog.getLibraryManager().wholeContent());
+        final Term normalized = TermApi.normalize(created, this.prolog.getLibraryManager().wholeContent());
         return normalized;
     }
 
@@ -60,7 +59,7 @@ public class DefaultTermAdapter implements TermAdapter {
             convertedArgs[i] = termFrom(theArguments[i], theMode);
         }
         final Term created = new Struct(thePredicateName, convertedArgs);
-        final Term normalized = TERM_API.normalize(created, this.prolog.getLibraryManager().wholeContent());
+        final Term normalized = TermApi.normalize(created, this.prolog.getLibraryManager().wholeContent());
         return normalized;
     }
 
@@ -90,7 +89,7 @@ public class DefaultTermAdapter implements TermAdapter {
         }
         // Otherwise apply basic algorithm from TermApi
         if (result == null) {
-            result = TERM_API.valueOf(theObject, theMode);
+            result = TermApi.valueOf(theObject, theMode);
         }
         return result;
     }

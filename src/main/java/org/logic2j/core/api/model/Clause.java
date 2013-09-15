@@ -36,8 +36,6 @@ import org.logic2j.core.impl.theory.TheoryManager;
  */
 public class Clause {
 
-    private static final TermApi TERM_API = new TermApi();
-
     /**
      * The {@link Struct} that represents the content of either a rule (when it has a body) or a fact (does not have a body - or has "true"
      * as body), see description of {@link #isFact()}.
@@ -60,7 +58,7 @@ public class Clause {
             throw new InvalidTermException("Need a Struct to build a clause, not " + theClauseTerm);
         }
         // Any Clause must be normalized otherwise we won't be able to infer on it!
-        this.content = (Struct) TERM_API.normalize(theClauseTerm, theProlog.getLibraryManager().wholeContent());
+        this.content = (Struct) TermApi.normalize(theClauseTerm, theProlog.getLibraryManager().wholeContent());
         this.bindings = new Bindings(this.content);
     }
 

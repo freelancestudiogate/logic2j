@@ -47,6 +47,10 @@ import org.logic2j.core.library.mgmt.LibraryContent;
  */
 public class TermApi {
 
+    private TermApi() {
+        // Forbid instantiation
+    }
+
     public <T> T accept(Object theTerm, PartialTermVisitor<T> theVisitor) {
         if (theTerm instanceof String) {
             return theVisitor.visit((String) theTerm);
@@ -66,7 +70,7 @@ public class TermApi {
         return theVisitor.visit(theTerm);
     }
 
-    public boolean isAtom(Term theTerm) {
+    public static boolean isAtom(Term theTerm) {
         if (theTerm instanceof Struct) {
             final Struct s = (Struct) theTerm;
             return s.getArity() == 0 || s.isEmptyList();
@@ -104,7 +108,7 @@ public class TermApi {
      * @param theTerm
      * @return A collection of terms, never empty. Same terms may appear multiple times.
      */
-    Collection<Term> collectTerms(Term theTerm) {
+    static Collection<Term> collectTerms(Term theTerm) {
         final ArrayList<Term> recipient = new ArrayList<Term>();
         collectTermsInto(theTerm, recipient);
         // Remove ourself from the result - we are always at the end of the collection
@@ -119,7 +123,7 @@ public class TermApi {
      * @param theTerm
      * @return The factorized term, may be same as argument theTerm in case nothing was needed, or a new object.
      */
-    Term factorize(Term theTerm) {
+    static Term factorize(Term theTerm) {
         final Collection<Term> collection = collectTerms(theTerm);
         return factorize(theTerm, collection);
     }
@@ -217,7 +221,7 @@ public class TermApi {
      * @param theTerm
      * @return The number of variables found (recursively).
      */
-    short assignIndexes(Term theTerm) {
+    static short assignIndexes(Term theTerm) {
         return TermApi.assignIndexes(theTerm, (short) 0); // Start assigning indexes with zero
     }
 
@@ -260,7 +264,7 @@ public class TermApi {
      * @param theLibraryContent Defines primitives to be recognized
      * @return A normalized COPY of theTerm ready to be used for inference (in a Theory ore as a goal)
      */
-    public Term normalize(Term theTerm, LibraryContent theLibraryContent) {
+    public static Term normalize(Term theTerm, LibraryContent theLibraryContent) {
         final Term factorized = factorize(theTerm);
         assignIndexes(factorized);
         if (factorized instanceof Struct && theLibraryContent != null) {
@@ -284,7 +288,7 @@ public class TermApi {
      * @return An instance of a subclass of {@link Term}.
      * @throws InvalidTermException If theObject cannot be converted to a Term
      */
-    public Term valueOf(Object theObject, FactoryMode theMode) throws InvalidTermException {
+    public static Term valueOf(Object theObject, FactoryMode theMode) throws InvalidTermException {
         if (theObject == null) {
             throw new InvalidTermException("Cannot create Term from a null argument");
         }
@@ -352,7 +356,7 @@ public class TermApi {
      */
     // TODO Should this go to TermAdapter instead? - since we return a new Term
     @SuppressWarnings("unchecked")
-    public <T extends Term> T selectTerm(Term theTerm, String theTPathExpression, Class<T> theClass) {
+    public static <T extends Term> T selectTerm(Term theTerm, String theTPathExpression, Class<T> theClass) {
         if (theTPathExpression.isEmpty()) {
             return ReflectUtils.safeCastNotNull("selecting term", theTerm, theClass);
         }

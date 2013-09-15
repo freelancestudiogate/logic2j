@@ -30,6 +30,7 @@ import org.logic2j.core.api.model.symbol.TDouble;
 import org.logic2j.core.api.model.symbol.TLong;
 import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Term;
+import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Binding;
 import org.logic2j.core.api.model.var.Bindings;
@@ -185,7 +186,7 @@ public class CoreLibrary extends LibraryBase {
                 @SuppressWarnings("synthetic-access")
                 // FIXME !!! This is most certainly wrong: how can we call substitute on a variable expressed in a different bindings?????
                 // The case is : findall(X, Expr, Result) where Expr -> something -> expr(a,b,X,c)
-                final Term substitute = TERM_API.substitute(theTemplate, subGoalBindings, null);
+                final Term substitute = TermApi.substitute(theTemplate, subGoalBindings, null);
                 // Map<String, Term> explicitBindings = goalBindings.explicitBindings(FreeVarRepresentation.FREE);
                 // And add as extra solution
                 javaResults.add(substitute);

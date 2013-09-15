@@ -92,9 +92,9 @@ public class RDBClauseProvider extends RDBBase implements ClauseProvider {
         for (int i = 0; i < theGoal.getArity(); i++) {
             Term t = theGoal.getArg(i);
             if (t instanceof Var && theGoalBindings != null) {
-                t = TERM_API.substitute(theGoal.getArg(i), theGoalBindings, null);
+                t = TermApi.substitute(theGoal.getArg(i), theGoalBindings, null);
             }
-            final boolean isAtom = TERM_API.isAtom(t);
+            final boolean isAtom = TermApi.isAtom(t);
             if (t instanceof Struct && (isAtom || TermApi.isList(t))) {
                 if (isAtom) {
                     builder.addConjunction(builder.criterion(builder.column(table, columnName[i]), SqlBuilder3.OPERATOR_EQ_OR_IN, ((Struct) t).getName()));

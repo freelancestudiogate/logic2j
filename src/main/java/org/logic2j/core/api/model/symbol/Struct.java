@@ -50,8 +50,6 @@ public final class Struct extends Term {
      */
     private static final String VARARG_PREDICATE_TRAILER = "/" + VARARG_ARITY_SIGNATURE;
 
-    private static final TermApi TERM_API = new TermApi();
-
     // TODO Move these constants to a common place?
     // TODO Replace all calls to intern() by some factory to initialize our
     // constants. But aren't all java literal strings already internalized?
@@ -135,7 +133,7 @@ public final class Struct extends Term {
         final Struct newInstance = new Struct(theFunctor, argList.length);
         int i = 0;
         for (final Object element : argList) {
-            newInstance.args[i++] = TERM_API.valueOf(element, FactoryMode.ANY_TERM);
+            newInstance.args[i++] = TermApi.valueOf(element, FactoryMode.ANY_TERM);
         }
         return newInstance;
     }
@@ -533,7 +531,7 @@ public final class Struct extends Term {
     public Struct predicateFromPList() {
         assertPList(this);
         final Term functor = getLHS();
-        if (!TERM_API.isAtom(functor)) {
+        if (!TermApi.isAtom(functor)) {
             return null;
         }
         Struct runningElement = (Struct) getRHS();
