@@ -339,18 +339,16 @@ public final class Struct extends Term {
      * 
      * @param theCollectedTerms
      */
-    @Override
-    protected void collectTermsInto(Collection<Term> theCollectedTerms) {
+    void collectTermsInto(Collection<Term> theCollectedTerms) {
         this.index = NO_INDEX;
         for (int i = 0; i < this.arity; i++) {
             final Term child = this.args[i];
-            child.collectTermsInto(theCollectedTerms);
+            TermApi.collectTermsInto(child, theCollectedTerms);
         }
         theCollectedTerms.add(this);
     }
 
-    @Override
-    protected Term factorize(Collection<Term> theCollectedTerms) {
+    Term factorize(Collection<Term> theCollectedTerms) {
         if (this.arity == 0) {
             // This is an atom - find if we already have it in our catalog
             final Struct found = ATOM_CATALOG.get(this.name);
@@ -364,7 +362,7 @@ public final class Struct extends Term {
         final Term[] newArgs = new Term[this.arity];
         boolean anyChange = false;
         for (int i = 0; i < this.arity; i++) {
-            newArgs[i] = this.args[i].factorize(theCollectedTerms);
+            newArgs[i] = TermApi.factorize(this.args[i], theCollectedTerms);
             anyChange |= (newArgs[i] != this.args[i]);
         }
         // Now initialize result - a new Struct only if any change was found below

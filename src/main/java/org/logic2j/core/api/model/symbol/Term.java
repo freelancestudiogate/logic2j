@@ -103,26 +103,6 @@ public abstract class Term implements Serializable, Cloneable {
     // ---------------------------------------------------------------------------
 
     /**
-     * Recursively collect all terms and add them to the collectedTerms collection, and also initialize their {@link #index} to
-     * {@link #NO_INDEX}. This is an internal template method: the public API entry point is {@link TermApi#collectTerms(Term)}; see a more
-     * detailed description there.
-     * 
-     * @param collectedTerms Recipient collection, {@link Term}s add here.
-     */
-    protected abstract void collectTermsInto(Collection<Term> theCollectedTerms);
-
-    /**
-     * Factorizing will either return a new {@link Term} or this {@link Term} depending if it already exists in the supplied Collection.
-     * This will factorize duplicated atoms, numbers, variables, or even structures that are statically equal. A factorized {@link Struct}
-     * will have all occurences of the same {@link Var}iable sharing the same object reference. This is an internal template method: the
-     * public API entry point is {@link TermApi#factorize(Term)}; see a more detailed description there.
-     * 
-     * @param theCollectedTerms The reference Terms to search for.
-     * @return Either this, or a new equivalent but factorized Term.
-     */
-    protected abstract Term factorize(Collection<Term> theCollectedTerms);
-
-    /**
      * Assign the {@link Term#index} value for {@link Var} and {@link Struct}s. This is an internal template method: the public API entry
      * point is {@link TermApi#assignIndexes(Term)}; see a more detailed description there.
      * 

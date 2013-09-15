@@ -28,6 +28,7 @@ import java.util.List;
 import org.logic2j.core.api.TermAdapter;
 import org.logic2j.core.api.TermAdapter.FactoryMode;
 import org.logic2j.core.api.TermExchanger;
+import org.logic2j.core.api.model.PartialTermVisitor;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.var.Binding;
@@ -46,12 +47,52 @@ import org.logic2j.core.library.mgmt.LibraryContent;
  */
 public class TermApi {
 
-    public boolean isAtom(Term theTerm) {
-        if (!(theTerm instanceof Struct)) {
-            return false;
+    public <T> T accept(Object theTerm, PartialTermVisitor<T> theVisitor) {
+        if (theTerm instanceof String) {
+            return theVisitor.visit((String) theTerm);
         }
-        final Struct s = (Struct) theTerm;
-        return s.getArity() == 0 || s.isEmptyList();
+        if (theTerm instanceof Struct) {
+            return theVisitor.visit((Struct) theTerm);
+        }
+        if (theTerm instanceof Var) {
+            return theVisitor.visit((Var) theTerm);
+        }
+        if (theTerm instanceof Long) {
+            return theVisitor.visit((Long) theTerm);
+        }
+        if (theTerm instanceof Double) {
+            return theVisitor.visit((Double) theTerm);
+        }
+        return theVisitor.visit(theTerm);
+    }
+
+    public boolean isAtom(Term theTerm) {
+        if (theTerm instanceof Struct) {
+            final Struct s = (Struct) theTerm;
+            return s.getArity() == 0 || s.isEmptyList();
+        }
+        // In the future
+        // if (theTerm instanceof String) {
+        // return true;
+        // }
+        return false;
+    }
+
+    /**
+     * Recursively collect all terms and add them to the collectedTerms collection, and also initialize their {@link #index} to
+     * {@link #NO_INDEX}. This is an internal template method: the public API entry point is {@link TermApi#collectTerms(Term)}; see a more
+     * detailed description there.
+     * 
+     * @param collection Recipient collection, {@link Term}s add here.
+     */
+    public static void collectTermsInto(Term theTerm, Collection<Term> collection) {
+        if (theTerm instanceof Struct) {
+            ((Struct) theTerm).collectTermsInto(collection);
+        } else if (theTerm instanceof Var) {
+            ((Var) theTerm).collectTermsInto(collection);
+        } else if (theTerm instanceof TNumber) {
+            ((TNumber) theTerm).collectTermsInto(collection);
+        }
     }
 
     /**
@@ -63,7 +104,7 @@ public class TermApi {
      */
     Collection<Term> collectTerms(Term theTerm) {
         final ArrayList<Term> recipient = new ArrayList<Term>();
-        theTerm.collectTermsInto(recipient);
+        collectTermsInto(theTerm, recipient);
         // Remove ourself from the result - we are always at the end of the collection
         recipient.remove(recipient.size() - 1);
         return recipient;
@@ -78,7 +119,27 @@ public class TermApi {
      */
     Term factorize(Term theTerm) {
         final Collection<Term> collection = collectTerms(theTerm);
-        return theTerm.factorize(collection);
+        return factorize(theTerm, collection);
+    }
+
+    /**
+     * Factorizing will either return a new {@link Term} or this {@link Term} depending if it already exists in the supplied Collection.
+     * This will factorize duplicated atoms, numbers, variables, or even structures that are statically equal. A factorized {@link Struct}
+     * will have all occurences of the same {@link Var}iable sharing the same object reference. This is an internal template method: the
+     * public API entry point is {@link TermApi#factorize(Term)}; see a more detailed description there.
+     * 
+     * @param theCollectedTerms The reference Terms to search for.
+     * @return Either this, or a new equivalent but factorized Term.
+     */
+    public static Term factorize(Term theTerm, Collection<Term> collection) {
+        if (theTerm instanceof Struct) {
+            return ((Struct) theTerm).factorize(collection);
+        } else if (theTerm instanceof Var) {
+            return ((Var) theTerm).factorize(collection);
+        } else if (theTerm instanceof TNumber) {
+            return ((TNumber) theTerm).factorize(collection);
+        }
+        throw new PrologNonSpecificError("Should not happen here");
     }
 
     // TODO Currently unused - but probably we should

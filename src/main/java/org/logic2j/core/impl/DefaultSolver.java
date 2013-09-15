@@ -17,8 +17,6 @@
  */
 package org.logic2j.core.impl;
 
-import java.util.List;
-
 import org.logic2j.core.api.ClauseProvider;
 import org.logic2j.core.api.DataFactProvider;
 import org.logic2j.core.api.SolutionListener;

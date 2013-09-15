@@ -166,14 +166,12 @@ public final class Var extends Term {
      * 
      * @param theCollectedTerms
      */
-    @Override
-    protected void collectTermsInto(Collection<Term> theCollectedTerms) {
+    void collectTermsInto(Collection<Term> theCollectedTerms) {
         this.index = NO_INDEX;
         theCollectedTerms.add(this);
     }
 
-    @Override
-    protected Term factorize(Collection<Term> theCollectedTerms) {
+    Term factorize(Collection<Term> theCollectedTerms) {
         // If this term already has an equivalent in the provided collection, return that one
         final Term alreadyThere = findStructurallyEqualWithin(theCollectedTerms);
         if (alreadyThere != null) {
