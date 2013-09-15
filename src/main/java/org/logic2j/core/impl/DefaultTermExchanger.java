@@ -108,7 +108,7 @@ public class DefaultTermExchanger implements TermExchanger {
         private String formatRecursive(Struct theStruct) {
             final Term h = theStruct.getLHS();
             final Term t = theStruct.getRHS();
-            if (t.isList()) {
+            if (TermApi.isList(t)) {
                 final Struct tl = (Struct) t;
                 if (tl.isEmptyList()) {
                     return h.toString();
@@ -150,7 +150,7 @@ public class DefaultTermExchanger implements TermExchanger {
         private String toStringAsList(Struct theStruct, OperatorManager op) {
             final Term h = theStruct.getLHS();
             final Term t = theStruct.getRHS();
-            if (t.isList()) {
+            if (TermApi.isList(t)) {
                 final Struct tl = (Struct) t;
                 if (tl.isEmptyList()) {
                     return toStringAsArgY(h, op, 0);

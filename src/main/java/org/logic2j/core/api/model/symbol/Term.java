@@ -80,11 +80,6 @@ public abstract class Term implements Serializable, Cloneable {
     // Template methods (abstract here, implemented in all derived classes)
     // ---------------------------------------------------------------------------
 
-    /**
-     * @return true if this Term denotes a Prolog list.
-     */
-    public abstract boolean isList();
-
     public abstract <T> T accept(TermVisitor<T> theVisitor);
 
     // ---------------------------------------------------------------------------

@@ -33,6 +33,7 @@ import org.logic2j.core.api.model.Clause;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.Term;
+import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Bindings;
 import org.logic2j.core.impl.PrologImplementation;
@@ -94,10 +95,10 @@ public class RDBClauseProvider extends RDBBase implements ClauseProvider {
                 t = TERM_API.substitute(theGoal.getArg(i), theGoalBindings, null);
             }
             final boolean isAtom = TERM_API.isAtom(t);
-            if (t instanceof Struct && (isAtom || t.isList())) {
+            if (t instanceof Struct && (isAtom || TermApi.isList(t))) {
                 if (isAtom) {
                     builder.addConjunction(builder.criterion(builder.column(table, columnName[i]), SqlBuilder3.OPERATOR_EQ_OR_IN, ((Struct) t).getName()));
-                } else if (t.isList()) {
+                } else if (TermApi.isList(t)) {
                     addConjunctionList(builder, table, i, ((Struct) t).javaListFromPList(new ArrayList<Struct>(), Struct.class));
                 }
             }

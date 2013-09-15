@@ -470,13 +470,12 @@ public final class Struct extends Term {
         return this.name.equals(FUNCTOR_LIST_EMPTY) && this.arity == 0;
     }
 
-    @Override
-    public boolean isList() {
-        return (this.name.equals(FUNCTOR_LIST) && this.arity == 2 && this.args[1].isList()) || isEmptyList();
+    boolean isList() {
+        return (this.name.equals(FUNCTOR_LIST) && this.arity == 2 && TermApi.isList(this.args[1])) || isEmptyList();
     }
 
     protected void assertPList(Term thePList) {
-        if (!thePList.isList()) {
+        if (!TermApi.isList(thePList)) {
             throw new PrologNonSpecificError("The structure \"" + thePList + "\" is not a Prolog list.");
         }
     }
@@ -591,7 +590,7 @@ public final class Struct extends Term {
             this.args = new Term[this.arity];
             this.args[0] = t;
             this.args[1] = Struct.EMPTY_LIST;
-        } else if (this.args[1].isList()) {
+        } else if (TermApi.isList(this.args[1])) {
             ((Struct) this.args[1]).append(t);
         } else {
             this.args[1] = t;

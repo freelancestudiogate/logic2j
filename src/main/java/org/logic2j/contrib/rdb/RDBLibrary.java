@@ -335,7 +335,7 @@ public class RDBLibrary extends LibraryBase {
             return ((TNumber) theTerm).longValue();
         } else if (theTerm instanceof Struct) {
             final Struct struct = (Struct) theTerm;
-            if (struct.isList()) {
+            if (TermApi.isList(struct)) {
                 final Set<Object> javaList = new HashSet<Object>();
                 for (final Term t : struct.javaListFromPList(new ArrayList<Term>(), Term.class)) {
                     javaList.add(jdbcFromTerm(t));

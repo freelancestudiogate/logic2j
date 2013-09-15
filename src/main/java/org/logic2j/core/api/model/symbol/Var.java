@@ -115,11 +115,6 @@ public final class Var extends Term {
     // Template methods defined in abstract class Term
     // ---------------------------------------------------------------------------
 
-    @Override
-    public boolean isList() {
-        return false;
-    }
-
     Var findVar(String theVariableName) {
         if (ANONYMOUS_VAR_NAME.equals(theVariableName)) {
             throw new PrologInternalError("Cannot find the anonymous variable");

@@ -182,6 +182,16 @@ public class TermApi {
         }
     }
 
+    /**
+     * @return true if this Term denotes a Prolog list.
+     */
+    public static boolean isList(Term theTerm) {
+        if (theTerm instanceof Struct) {
+            return ((Struct) theTerm).isList();
+        }
+        return false;
+    }
+
     // TODO Currently unused - but probably we should
     void avoidCycle(Struct theClause) {
         final List<Term> visited = new ArrayList<Term>(20);

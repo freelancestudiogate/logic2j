@@ -21,6 +21,7 @@ import org.logic2j.core.api.model.Continuation;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.Term;
+import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.var.Bindings;
 import org.logic2j.core.impl.PrologImplementation;
 import org.logic2j.core.library.impl.LibraryBase;
@@ -44,7 +45,7 @@ public class ConfigLibrary extends LibraryBase {
         final String password = ((Struct) theArguments[3]).getName();
         final String prefix = ((Struct) theArguments[4]).getName();
         final Set<String> tablesToMap = new HashSet<String>();
-        if (theArguments.length > 5 && theArguments[5].isList()) {
+        if (theArguments.length > 5 && TermApi.isList(theArguments[5])) {
             for (final Struct struct : ((Struct) theArguments[5]).javaListFromPList(new ArrayList<Struct>(), Struct.class)) {
                 tablesToMap.add(struct.getName().toLowerCase());
             }
