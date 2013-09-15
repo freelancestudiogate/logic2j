@@ -49,8 +49,7 @@ public final class TLong extends TNumber {
     // Template methods defined in abstract class Term
     // ---------------------------------------------------------------------------
 
-    @Override
-    public <T> T accept(TermVisitor<T> theVisitor) {
+    <T> T accept(TermVisitor<T> theVisitor) {
         return theVisitor.visit(this);
     }
 

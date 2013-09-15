@@ -28,7 +28,7 @@ import java.util.List;
 import org.logic2j.core.api.TermAdapter;
 import org.logic2j.core.api.TermAdapter.FactoryMode;
 import org.logic2j.core.api.TermExchanger;
-import org.logic2j.core.api.model.PartialTermVisitor;
+import org.logic2j.core.api.model.TermVisitor;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.var.Binding;
@@ -51,15 +51,25 @@ public class TermApi {
         // Forbid instantiation
     }
 
-    public <T> T accept(Object theTerm, PartialTermVisitor<T> theVisitor) {
-        if (theTerm instanceof String) {
-            return theVisitor.visit((String) theTerm);
-        }
+    public static <T> T accept(Object theTerm, TermVisitor<T> theVisitor) {
+        // TermVisitor
         if (theTerm instanceof Struct) {
             return theVisitor.visit((Struct) theTerm);
         }
         if (theTerm instanceof Var) {
             return theVisitor.visit((Var) theTerm);
+        }
+        if (theTerm instanceof TLong) {
+            return theVisitor.visit((TLong) theTerm);
+        }
+        if (theTerm instanceof TDouble) {
+            return theVisitor.visit((TDouble) theTerm);
+        }
+        throw new PrologNonSpecificError("Should not happen here");
+        /*
+        // Extension
+        if (theTerm instanceof String) {
+            return theVisitor.visit((String) theTerm);
         }
         if (theTerm instanceof Long) {
             return theVisitor.visit((Long) theTerm);
@@ -68,6 +78,7 @@ public class TermApi {
             return theVisitor.visit((Double) theTerm);
         }
         return theVisitor.visit(theTerm);
+        */
     }
 
     public static boolean isAtom(Term theTerm) {

@@ -249,7 +249,7 @@ public class DefaultTermExchanger implements TermExchanger {
         if (this.prolog != null) {
             return fv.toStringAsArgY(theTerm, this.prolog.getOperatorManager(), Operator.OP_HIGH);
         }
-        return theTerm.accept(fv);
+        return TermApi.accept(theTerm, fv);
     }
 
 }

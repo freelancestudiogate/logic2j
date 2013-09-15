@@ -17,20 +17,14 @@
  */
 package org.logic2j.core.api.model;
 
-import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.Term;
-import org.logic2j.core.api.model.symbol.Var;
 
 /**
  * Generic Visitor for the {@link Term} hierarchy. For reference, see the Visitor design pattern.
  */
-public interface PartialTermVisitor<T> {
+public interface PartialTermVisitor<T> extends TermVisitor<T> {
 
     T visit(String theAtomString);
-
-    T visit(Struct theStruct);
-
-    T visit(Var theVar);
 
     T visit(Long theLong);
 

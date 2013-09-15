@@ -20,6 +20,7 @@ package org.logic2j.core.api.model;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.TDouble;
 import org.logic2j.core.api.model.symbol.TLong;
+import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
 
 /**
@@ -54,7 +55,7 @@ public class TermVisitorBase<T> implements TermVisitor<T> {
     public T visit(Struct theStruct) {
         // Recurse through children
         for (int i = 0; i < theStruct.getArity(); i++) {
-            final T result = theStruct.getArg(i).accept(this);
+            final T result = TermApi.accept(theStruct.getArg(i), this);
             // Until the first returning a non-null result
             if (result != null) {
                 return result;

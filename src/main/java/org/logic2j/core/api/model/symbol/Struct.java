@@ -605,8 +605,7 @@ public final class Struct extends Term {
         this.args[1] = co;
     }
 
-    @Override
-    public <T> T accept(TermVisitor<T> theVisitor) {
+    <T> T accept(TermVisitor<T> theVisitor) {
         return theVisitor.visit(this);
     }
 

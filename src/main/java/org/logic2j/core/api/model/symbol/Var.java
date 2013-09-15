@@ -211,8 +211,7 @@ public final class Var extends Term {
         return (short) (theIndexOfNextNonIndexedVar + 1);
     }
 
-    @Override
-    public <T> T accept(TermVisitor<T> theVisitor) {
+    <T> T accept(TermVisitor<T> theVisitor) {
         return theVisitor.visit(this);
     }
 

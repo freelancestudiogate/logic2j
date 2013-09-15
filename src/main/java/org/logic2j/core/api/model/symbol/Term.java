@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.logic2j.core.api.TermExchanger;
-import org.logic2j.core.api.model.TermVisitor;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.var.Binding;
 import org.logic2j.core.api.model.var.Bindings;
@@ -78,8 +77,6 @@ public abstract class Term implements Serializable, Cloneable {
     // ---------------------------------------------------------------------------
     // Template methods (abstract here, implemented in all derived classes)
     // ---------------------------------------------------------------------------
-
-    public abstract <T> T accept(TermVisitor<T> theVisitor);
 
     // ---------------------------------------------------------------------------
     // Graph traversal methods, template methods with "protected" scope, user code should use TermApi methods instead.
