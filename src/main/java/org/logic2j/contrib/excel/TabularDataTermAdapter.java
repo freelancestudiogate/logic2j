@@ -38,12 +38,6 @@ public class TabularDataTermAdapter extends DefaultTermAdapter {
         super(theProlog);
     }
 
-    /**
-     * TODO Almost the same code in {@link TabularDataFactProvider#listMatchingDataFacts(org.logic2j.core.api.model.symbol.Struct)
-     * acts(Struct)} we should use a
-     * common
-     * codebase
-     */
     @Override
     public List<Term> terms(Object theObject, AssertionMode theAssertionMode) {
         if (!(theObject instanceof TabularData)) {
