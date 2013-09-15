@@ -20,7 +20,7 @@ package org.logic2j.core.impl;
 
 import org.logic2j.core.api.TermExchanger;
 import org.logic2j.core.api.model.OperatorManager;
-import org.logic2j.core.api.model.TermVisitor;
+import org.logic2j.core.api.model.PartialTermVisitor;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.TDouble;
 import org.logic2j.core.api.model.symbol.TLong;
@@ -41,7 +41,7 @@ public class DefaultTermExchanger implements TermExchanger {
     // Element separator in lists: [a,b,c]
     private static final String ELEM_SEPARATOR = ",".intern();
 
-    private class FormattingVisitor implements TermVisitor<String> {
+    private class FormattingVisitor implements PartialTermVisitor<String> {
 
         @Override
         public String visit(TLong theLong) {
@@ -61,6 +61,26 @@ public class DefaultTermExchanger implements TermExchanger {
         @Override
         public String visit(Var theVar) {
             return String.valueOf(formatVar(theVar));
+        }
+
+        @Override
+        public String visit(String theAtomString) {
+            return theAtomString;
+        }
+
+        @Override
+        public String visit(Long theLong) {
+            return String.valueOf(theLong);
+        }
+
+        @Override
+        public String visit(Double theDouble) {
+            return String.valueOf(theDouble);
+        }
+
+        @Override
+        public String visit(Object theObject) {
+            return String.valueOf(theObject);
         }
 
         /**

@@ -75,10 +75,6 @@ public abstract class Term implements Serializable, Cloneable {
     // org.logic2j.core.optional.io.format.DetailedFormatter();
 
     // ---------------------------------------------------------------------------
-    // Template methods (abstract here, implemented in all derived classes)
-    // ---------------------------------------------------------------------------
-
-    // ---------------------------------------------------------------------------
     // Graph traversal methods, template methods with "protected" scope, user code should use TermApi methods instead.
     // Some traversal are implemented by the Visitor design pattern and the #accept() method
     // ---------------------------------------------------------------------------

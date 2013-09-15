@@ -28,7 +28,7 @@ import org.logic2j.core.api.model.symbol.Var;
  * accept() returns non-null.<br/>
  * Intended to be derived when implementing useful {@link TermVisitor}s. Appropriate for searching through structures, or traversing all.
  */
-public class TermVisitorBase<T> implements TermVisitor<T> {
+public class TermVisitorBase<T> implements PartialTermVisitor<T> {
 
     @Override
     public T visit(TLong theLong) {
@@ -61,6 +61,30 @@ public class TermVisitorBase<T> implements TermVisitor<T> {
                 return result;
             }
         }
+        return null;
+    }
+
+    @Override
+    public T visit(String theAtomString) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public T visit(Long theLong) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public T visit(Double theDouble) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public T visit(Object theObject) {
+        // TODO Auto-generated method stub
         return null;
     }
 }
