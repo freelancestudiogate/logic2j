@@ -196,8 +196,7 @@ public final class Var extends Term {
     /**
      * Assign a new {@link Term#index} to a Var if it was not assigned before.
      */
-    @Override
-    protected short assignIndexes(short theIndexOfNextNonIndexedVar) {
+    short assignIndexes(short theIndexOfNextNonIndexedVar) {
         if (this.index != NO_INDEX) {
             // Already assigned, do nothing
             return theIndexOfNextNonIndexedVar; // return same index since we did nothing

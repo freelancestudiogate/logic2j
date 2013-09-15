@@ -192,10 +192,23 @@ public class TermApi {
         return false;
     }
 
-    // TODO Currently unused - but probably we should
-    void avoidCycle(Struct theClause) {
-        final List<Term> visited = new ArrayList<Term>(20);
-        theClause.avoidCycle(visited);
+    /**
+     * Assign the {@link Term#index} value for {@link Var} and {@link Struct}s. This is an internal template method: the public API entry
+     * point is {@link TermApi#assignIndexes(Term)}; see a more detailed description there.
+     * 
+     * @param theIndexOfNextNonIndexedVar
+     * @return The next value for theIndexOfNextNonIndexedVar, allow successive calls to increment.
+     */
+    public static short assignIndexes(Term theTerm, short theIndexOfNextNonIndexedVar) {
+        if (theTerm instanceof Struct) {
+            return ((Struct) theTerm).assignIndexes(theIndexOfNextNonIndexedVar);
+        } else if (theTerm instanceof Var) {
+            return ((Var) theTerm).assignIndexes(theIndexOfNextNonIndexedVar);
+        } else if (theTerm instanceof TNumber) {
+            return ((TNumber) theTerm).assignIndexes(theIndexOfNextNonIndexedVar);
+        } else {
+            throw new PrologNonSpecificError("Should not happen here");
+        }
     }
 
     /**
@@ -205,7 +218,13 @@ public class TermApi {
      * @return The number of variables found (recursively).
      */
     short assignIndexes(Term theTerm) {
-        return theTerm.assignIndexes((short) 0); // Start assigning indexes with zero
+        return TermApi.assignIndexes(theTerm, (short) 0); // Start assigning indexes with zero
+    }
+
+    // TODO Currently unused - but probably we should
+    void avoidCycle(Struct theClause) {
+        final List<Term> visited = new ArrayList<Term>(20);
+        theClause.avoidCycle(visited);
     }
 
     /**

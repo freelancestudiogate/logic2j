@@ -86,8 +86,7 @@ public abstract class TNumber extends Term implements Comparable<TNumber> {
         return equals(theOther);
     }
 
-    @Override
-    public short assignIndexes(short theIndexOfNextNonIndexedVar) {
+    short assignIndexes(short theIndexOfNextNonIndexedVar) {
         // Don't leave the default NO_INDEX value otherwise this term won't be considered properly normalized.
         this.index = 0;
         return theIndexOfNextNonIndexedVar; // return same index since we did not assign a new Var's index

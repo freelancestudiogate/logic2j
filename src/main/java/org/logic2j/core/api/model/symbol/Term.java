@@ -88,15 +88,6 @@ public abstract class Term implements Serializable, Cloneable {
     // ---------------------------------------------------------------------------
 
     /**
-     * Assign the {@link Term#index} value for {@link Var} and {@link Struct}s. This is an internal template method: the public API entry
-     * point is {@link TermApi#assignIndexes(Term)}; see a more detailed description there.
-     * 
-     * @param theIndexOfNextNonIndexedVar
-     * @return The next value for theIndexOfNextNonIndexedVar, allow successive calls to increment.
-     */
-    protected abstract short assignIndexes(short theIndexOfNextNonIndexedVar);
-
-    /**
      * This is an internal template method: the public API entry point is {@link TermApi#substitute(Term, Bindings, IdentityHashMap)}; see a
      * more detailed description there.
      * 
