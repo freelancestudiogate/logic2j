@@ -18,13 +18,11 @@
 package org.logic2j.core.impl;
 
 import org.logic2j.core.api.ClauseProvider;
-import org.logic2j.core.api.DataFactProvider;
 import org.logic2j.core.api.SolutionListener;
 import org.logic2j.core.api.Solver;
 import org.logic2j.core.api.Unifier;
 import org.logic2j.core.api.model.Clause;
 import org.logic2j.core.api.model.Continuation;
-import org.logic2j.core.api.model.DataFact;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.Term;
@@ -271,28 +269,6 @@ public class DefaultSolver implements Solver {
             }
             if (debug) {
                 logger.debug("Last ClauseProvider iterated");
-            }
-
-            // Now fetch data
-            final Iterable<DataFactProvider> dataProviders = this.prolog.getTheoryManager().getDataFactProviders();
-            for (final DataFactProvider dataProvider : dataProviders) {
-                final Iterable<DataFact> matchingDataFacts = dataProvider.listMatchingDataFacts(goalStruct);
-                // logger.info("Matching datafacts: {}", ((List<?>) matchingDataFacts).size());
-                for (final DataFact dataFact : matchingDataFacts) {
-                    // We should probably try/finally between unification and deunification. However since we unify with data
-                    // and need efficiency, and we won't call any user code, we can assume not to.
-                    final boolean unifiedWithData = unifier.unify(goalTerm, theGoalBindings, dataFact);
-                    if (unifiedWithData) {
-                        final Continuation continuation = theSolutionListener.onSolution();
-                        if (continuation == Continuation.CUT) {
-                            result = Continuation.CUT;
-                        } else if (continuation == Continuation.USER_ABORT) {
-                            // TODO should we just "return" from here?
-                            result = Continuation.USER_ABORT;
-                        }
-                        unifier.deunify();
-                    }
-                }
             }
 
         }

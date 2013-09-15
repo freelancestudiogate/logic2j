@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.logic2j.core.api.ClauseProvider;
-import org.logic2j.core.api.DataFactProvider;
 import org.logic2j.core.api.SolutionListener;
 import org.logic2j.core.api.Solver;
 import org.logic2j.core.api.model.Clause;
@@ -52,7 +51,6 @@ public class DefaultTheoryManager implements TheoryManager {
     private final PrologImplementation prolog;
     private final TheoryContent wholeContent = new TheoryContent();
     private List<ClauseProvider> clauseProviders = new ArrayList<ClauseProvider>();
-    private List<DataFactProvider> dataFactProviders = new ArrayList<DataFactProvider>();
 
     /**
      * Constructor
@@ -147,11 +145,6 @@ public class DefaultTheoryManager implements TheoryManager {
         this.clauseProviders.add(theNewProvider);
     }
 
-    @Override
-    public void addDataFactProvider(DataFactProvider theNewProvider) {
-        this.dataFactProviders.add(theNewProvider);
-    }
-
     // ---------------------------------------------------------------------------
     // Accessors
     // ---------------------------------------------------------------------------
@@ -164,14 +157,6 @@ public class DefaultTheoryManager implements TheoryManager {
 
     public void setClauseProviders(List<ClauseProvider> clauseProviders) {
         this.clauseProviders = clauseProviders;
-    }
-
-    public List<DataFactProvider> getDataFactProviders() {
-        return dataFactProviders;
-    }
-
-    public void setDataFactProviders(List<DataFactProvider> dataFactProviders) {
-        this.dataFactProviders = dataFactProviders;
     }
 
     // ---------------------------------------------------------------------------
