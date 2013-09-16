@@ -34,8 +34,8 @@ class UnificationTester {
 
     private final Unifier unifier;
 
-    public Term left;
-    public Term right;
+    public Object left;
+    public Object right;
     public Bindings leftVars;
     public Bindings rightVars;
     private Boolean expectedResult = null; // TODO Good candidates for hamctest 1.3
@@ -70,7 +70,7 @@ class UnificationTester {
      * @param theRight
      * @param bindings
      */
-    private void init1(Term theLeft, Term theRight, Bindings bindings) {
+    private void init1(Object theLeft, Object theRight, Bindings bindings) {
         this.left = TermApi.normalize(theLeft, null);
         this.right = TermApi.normalize(theRight, null);
         this.leftVars = bindings;
@@ -142,7 +142,7 @@ class UnificationTester {
         assertEquals("Same post-unification state signatures", signatureLR.toString(), signatureRL.toString());
     }
 
-    public void unify2ways(Term theLeft, Term theRight, Bindings bindings) {
+    public void unify2ways(Object theLeft, Object theRight, Bindings bindings) {
         init1(theLeft, theRight, bindings);
         final StringBuilder signatureLR = new StringBuilder();
         final boolean unifyLR = unifyLR(signatureLR);

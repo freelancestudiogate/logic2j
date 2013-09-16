@@ -48,15 +48,15 @@ public abstract class TNumber extends Term implements Comparable<TNumber> {
      * 
      * @param theCollectedTerms
      */
-    void collectTermsInto(Collection<Term> theCollectedTerms) {
+    void collectTermsInto(Collection<Object> theCollectedTerms) {
         this.index = NO_INDEX;
         theCollectedTerms.add(this);
     }
 
-    Term factorize(Collection<Term> theCollectedTerms) {
+    Object factorize(Collection<Object> theCollectedTerms) {
         // If this term already has an equivalent in the provided collection,
         // return that one
-        final Term alreadyThere = findStructurallyEqualWithin(theCollectedTerms);
+        final Object alreadyThere = findStructurallyEqualWithin(theCollectedTerms);
         if (alreadyThere != null) {
             return alreadyThere;
         }
@@ -78,7 +78,7 @@ public abstract class TNumber extends Term implements Comparable<TNumber> {
      * @param theOther
      * @return true when references are the same, or when values represented by the associated numbers are the same.
      */
-    boolean structurallyEquals(Term theOther) {
+    boolean structurallyEquals(Object theOther) {
         if (theOther == this) {
             return true; // Same reference
         }

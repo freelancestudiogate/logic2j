@@ -125,7 +125,7 @@ public final class Var extends Term {
         return null;
     }
 
-    Term substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
+    Object substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
         if (isAnonymous()) {
             // Anonymous variable is never bound - won't substitute
             return this;
@@ -159,20 +159,20 @@ public final class Var extends Term {
      * 
      * @param theCollectedTerms
      */
-    void collectTermsInto(Collection<Term> theCollectedTerms) {
+    void collectTermsInto(Collection<Object> theCollectedTerms) {
         this.index = NO_INDEX;
         theCollectedTerms.add(this);
     }
 
-    Term factorize(Collection<Term> theCollectedTerms) {
+    Object factorize(Collection<Object> theCollectedTerms) {
         // If this term already has an equivalent in the provided collection, return that one
-        final Term alreadyThere = findStructurallyEqualWithin(theCollectedTerms);
+        final Object alreadyThere = findStructurallyEqualWithin(theCollectedTerms);
         if (alreadyThere != null) {
             return alreadyThere;
         }
         // Not found by structural equality, we match variables by their name
         // TODO I'm not actually sure why we do this - we should probably log and identify why this case
-        for (final Term term : theCollectedTerms) {
+        for (final Object term : theCollectedTerms) {
             if (term instanceof Var) {
                 final Var var = (Var) term;
                 if (this.getName().equals(var.getName())) {
@@ -188,7 +188,7 @@ public final class Var extends Term {
      * @return true only when references are the same, otherwise two distinct {@link Var}s will always be considered different, despite
      *         their name, index, or whatever.
      */
-    boolean structurallyEquals(Term theOther) {
+    boolean structurallyEquals(Object theOther) {
         return theOther == this; // Check memory reference only
     }
 

@@ -80,9 +80,9 @@ public class RDBLibrary extends LibraryBase {
     }
 
     @Primitive
-    public Continuation select(SolutionListener theListener, Bindings theBindings, Term... theArguments) throws SQLException {
-        final Term theDataSource = theArguments[0];
-        final Term theExpression = theArguments[1];
+    public Continuation select(SolutionListener theListener, Bindings theBindings, Object... theArguments) throws SQLException {
+        final Object theDataSource = theArguments[0];
+        final Object theExpression = theArguments[1];
         final DataSource ds = bound(theDataSource, theBindings, DataSource.class);
 
         final Bindings expressionBindings = theBindings.focus(theExpression, Struct.class);
@@ -90,21 +90,21 @@ public class RDBLibrary extends LibraryBase {
         final Struct conditions = (Struct) expressionBindings.getReferrer();
 
         // Options
-        final Set<Term> optionSet = new HashSet<Term>(Arrays.asList(theArguments).subList(2, theArguments.length));
+        final Set<Object> optionSet = new HashSet<Object>(Arrays.asList(theArguments).subList(2, theArguments.length));
         final boolean isDistinct = optionSet.contains(new Struct("distinct"));
 
         //
         final String resultVar = "Tbl";
 
         // The goal we are solving
-        Term internalGoal = Struct.valueOf("gd3_solve", conditions, resultVar);
-        internalGoal = internalGoal.cloneIt();
+        Object internalGoal = Struct.valueOf("gd3_solve", conditions, resultVar);
+        internalGoal = TermApi.cloneTerm(internalGoal);
         // Watch out this destroys the indexes in the original expression !!!!
         internalGoal = TermApi.normalize(internalGoal, getProlog().getLibraryManager().wholeContent());
         final Bindings internalBindings = new Bindings(internalGoal);
         final UniqueSolutionListener internalListener = new UniqueSolutionListener(internalBindings);
         getProlog().getSolver().solveGoal(internalBindings, internalListener);
-        final Term result = internalListener.getSolution().getBinding(resultVar);
+        final Object result = internalListener.getSolution().getBinding(resultVar);
         if (!(result instanceof Struct)) {
             throw new InvalidTermException("Internal result must be a Struct");
         }
@@ -353,7 +353,7 @@ public class RDBLibrary extends LibraryBase {
      * @param desiredClassOrInterface
      * @return The object bound to a Term by its name
      */
-    private <T> T bound(Term theBinding, Bindings theBindings, Class<T> desiredClassOrInterface) {
+    private <T> T bound(Object theBinding, Bindings theBindings, Class<T> desiredClassOrInterface) {
         final Bindings b = theBindings.focus(theBinding, Struct.class);
         assertValidBindings(b, "bound");
         final Struct bindingName = (Struct) b.getReferrer();

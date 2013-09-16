@@ -84,7 +84,7 @@ public interface TermAdapter {
      * @param theMode
      * @return A factorized and normalized {@link Term}.
      */
-    Term term(Object theObject, FactoryMode theMode);
+    Object term(Object theObject, FactoryMode theMode);
 
     /**
      * Instantiate a Struct with arguments from virtually any class of {@link Object}; this is the highest-level factory
@@ -94,7 +94,7 @@ public interface TermAdapter {
      * @param theArguments
      * @return A factorized and normalized {@link Term}.
      */
-    Term term(String thePredicateName, FactoryMode theMode, Object... theArguments);
+    Object term(String thePredicateName, FactoryMode theMode, Object... theArguments);
 
     /**
      * Instantiate a list of Terms from one (possibly large) {@link Object}.
@@ -102,7 +102,7 @@ public interface TermAdapter {
      * @param theObject
      * @return
      */
-    List<Term> terms(Object theObject, AssertionMode theAssertionMode);
+    List<Object> terms(Object theObject, AssertionMode theAssertionMode);
 
     /**
      * Convert a Term into the desired target Class.

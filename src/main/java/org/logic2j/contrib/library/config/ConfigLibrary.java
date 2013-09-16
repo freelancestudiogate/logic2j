@@ -38,7 +38,7 @@ public class ConfigLibrary extends LibraryBase {
     }
 
     @Primitive
-    public Continuation rdb_config(SolutionListener theListener, Bindings theBindings, Term... theArguments) throws SQLException {
+    public Continuation rdb_config(SolutionListener theListener, Bindings theBindings, Object... theArguments) throws SQLException {
         final String driver = ((Struct) theArguments[0]).getName();
         final String connectionString = ((Struct) theArguments[1]).getName();
         final String username = ((Struct) theArguments[2]).getName();

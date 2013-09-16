@@ -41,7 +41,7 @@ public class DefaultLibraryManager implements LibraryManager {
 
     /**
      * Difference between number of args in Prolog's primitive invocation, and number of varargs
-     * passed to Java implementatino of the primitive: (SolutionListener theListener, Bindings theBindings, Term...)
+     * passed to Java implementatino of the primitive: (SolutionListener theListener, Bindings theBindings, Object...)
      */
     private static final int NB_EXTRA_PARAMS = 2;
 
@@ -158,11 +158,11 @@ public class DefaultLibraryManager implements LibraryManager {
                 i++;
                 boolean varargs = false;
                 if (i < nbMethodParams) {
-                    if (Term[].class.isAssignableFrom(paramTypes[i])) {
+                    if (Object[].class.isAssignableFrom(paramTypes[i])) {
                         varargs = true;
                     } else {
                         while (i < nbMethodParams) {
-                            if (!(Term.class.isAssignableFrom(paramTypes[i]))) {
+                            if (!(Object.class.isAssignableFrom(paramTypes[i]))) {
                                 throw new PrologNonSpecificError("Argument type at index " + i + " of method " + method + " not of proper " + Term.class);
                             }
                             i++;

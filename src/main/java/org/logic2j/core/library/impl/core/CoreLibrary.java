@@ -65,7 +65,7 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive
-    public Continuation var(SolutionListener theListener, Bindings theBindings, Term t1) {
+    public Continuation var(SolutionListener theListener, Bindings theBindings, Object t1) {
         Continuation continuation = Continuation.CONTINUE;
 
         if (t1 instanceof Var) {
@@ -84,10 +84,10 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive
-    public Continuation atomic(SolutionListener theListener, Bindings theBindings, Term theTerm) {
+    public Continuation atomic(SolutionListener theListener, Bindings theBindings, Object theTerm) {
         final Bindings b = theBindings.focus(theTerm, Term.class);
         assertValidBindings(b, "atomic/1");
-        final Term effectiveTerm = b.getReferrer();
+        final Object effectiveTerm = b.getReferrer();
         if (effectiveTerm instanceof Struct || effectiveTerm instanceof TNumber) {
             return notifySolution(theListener);
         }
@@ -95,10 +95,10 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive
-    public Continuation number(SolutionListener theListener, Bindings theBindings, Term theTerm) {
+    public Continuation number(SolutionListener theListener, Bindings theBindings, Object theTerm) {
         final Bindings b = theBindings.focus(theTerm, Term.class);
         assertValidBindings(b, "number/1");
-        final Term effectiveTerm = b.getReferrer();
+        final Object effectiveTerm = b.getReferrer();
         if (effectiveTerm instanceof TNumber) {
             return notifySolution(theListener);
         }
@@ -114,13 +114,13 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive(name = "=")
-    public Continuation unify(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Continuation unify(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         final boolean unified = unify(t1, theBindings, t2, theBindings);
         return notifyIfUnified(unified, theListener);
     }
 
     @Primitive(name = "\\=")
-    public Continuation notUnify(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Continuation notUnify(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         final boolean unified = unify(t1, theBindings, t2, theBindings);
         Continuation continuation = Continuation.CONTINUE;
         if (!unified) {
@@ -134,7 +134,7 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive
-    public Continuation atom_length(SolutionListener theListener, Bindings theBindings, Term theAtom, Term theLength) {
+    public Continuation atom_length(SolutionListener theListener, Bindings theBindings, Object theAtom, Object theLength) {
         final Bindings atomBindings = theBindings.focus(theAtom, Struct.class);
         assertValidBindings(atomBindings, "atom_length/2");
         final Struct atom = (Struct) atomBindings.getReferrer();
@@ -146,7 +146,7 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(synonyms = "\\+")
     // Surprisingly enough the operator \+ means "not provable".
-    public Continuation not(final SolutionListener theListener, Bindings theBindings, Term theGoal) {
+    public Continuation not(final SolutionListener theListener, Bindings theBindings, Object theGoal) {
         final Bindings subGoalBindings = theBindings.focus(theGoal, Struct.class);
         assertValidBindings(subGoalBindings, "\\+/1");
 
@@ -172,12 +172,12 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive
-    public Continuation findall(SolutionListener theListener, final Bindings theBindings, final Term theTemplate, final Term theGoal, final Term theResult) {
+    public Continuation findall(SolutionListener theListener, final Bindings theBindings, final Object theTemplate, final Object theGoal, final Object theResult) {
         final Bindings subGoalBindings = theBindings.focus(theGoal, Term.class);
         assertValidBindings(subGoalBindings, "findall/3");
 
         // Define a listener to collect all solutions for the goal specified
-        final ArrayList<Term> javaResults = new ArrayList<Term>(); // Our internal collection of results
+        final ArrayList<Object> javaResults = new ArrayList<Object>(); // Our internal collection of results
         final SolutionListener adHocListener = new SolutionListenerBase() {
 
             @Override
@@ -186,7 +186,7 @@ public class CoreLibrary extends LibraryBase {
                 @SuppressWarnings("synthetic-access")
                 // FIXME !!! This is most certainly wrong: how can we call substitute on a variable expressed in a different bindings?????
                 // The case is : findall(X, Expr, Result) where Expr -> something -> expr(a,b,X,c)
-                final Term substitute = TermApi.substitute(theTemplate, subGoalBindings, null);
+                final Object substitute = TermApi.substitute(theTemplate, subGoalBindings, null);
                 // Map<String, Term> explicitBindings = goalBindings.explicitBindings(FreeVarRepresentation.FREE);
                 // And add as extra solution
                 javaResults.add(substitute);
@@ -211,7 +211,7 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive
-    public Continuation clause(SolutionListener theListener, Bindings theBindings, Term theHead, Term theBody) {
+    public Continuation clause(SolutionListener theListener, Bindings theBindings, Object theHead, Object theBody) {
         final Binding dereferencedBinding = dereferencedBinding(theHead, theBindings);
         final Struct realHead = ReflectUtils.safeCastNotNull("dereferencing argumnent for clause/2", dereferencedBinding.getTerm(), Struct.class);
         for (final ClauseProvider cp : getProlog().getTheoryManager().getClauseProviders()) {
@@ -239,7 +239,7 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive(name = "=..")
-    public Continuation predicate2PList(final SolutionListener theListener, Bindings theBindings, Term thePredicate, Term theList) {
+    public Continuation predicate2PList(final SolutionListener theListener, Bindings theBindings, Object thePredicate, Object theList) {
         Bindings resolvedBindings = theBindings.focus(thePredicate, Term.class);
         Continuation continuation = Continuation.CONTINUE;
 
@@ -255,10 +255,10 @@ public class CoreLibrary extends LibraryBase {
             final boolean unified = unify(thePredicate, theBindings, flattened, resolvedBindings);
             continuation = notifyIfUnified(unified, theListener);
         } else {
-            final Term predResolved = resolvedBindings.getReferrer();
+            final Object predResolved = resolvedBindings.getReferrer();
             if (predResolved instanceof Struct) {
                 final Struct struct = (Struct) predResolved;
-                final ArrayList<Term> elems = new ArrayList<Term>();
+                final ArrayList<Object> elems = new ArrayList<Object>();
                 elems.add(new Struct(struct.getName())); // Only copying the functor as an atom, not a deep copy of the struct!
                 final int arity = struct.getArity();
                 for (int i = 0; i < arity; i++) {
@@ -273,8 +273,8 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive
-    public Continuation is(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
-        final Term evaluated = evaluateFunctor(theBindings, t2);
+    public Continuation is(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
+        final Object evaluated = evaluateFunctor(theBindings, t2);
         if (evaluated == null) {
             return Continuation.CONTINUE;
         }
@@ -300,9 +300,9 @@ public class CoreLibrary extends LibraryBase {
      * @param theEvaluationFunction
      * @return
      */
-    private Continuation binaryNumericPredicate(SolutionListener theListener, Bindings theBindings, Term t1, Term t2, TNumberBinaryClosure theEvaluationFunction) {
-        final Term effectiveT1 = evaluateFunctor(theBindings, t1);
-        final Term effectiveT2 = evaluateFunctor(theBindings, t2);
+    private Continuation binaryNumericPredicate(SolutionListener theListener, Bindings theBindings, Object t1, Object t2, TNumberBinaryClosure theEvaluationFunction) {
+        final Object effectiveT1 = evaluateFunctor(theBindings, t1);
+        final Object effectiveT2 = evaluateFunctor(theBindings, t2);
         Continuation continuation = Continuation.CONTINUE;
         if (effectiveT1 instanceof TNumber && effectiveT2 instanceof TNumber) {
             final TNumber value1 = (TNumber) effectiveT1;
@@ -316,7 +316,7 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive(name = ">")
-    public Continuation expression_greater_than(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Continuation expression_greater_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
 
             @Override
@@ -327,7 +327,7 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive(name = "<")
-    public Continuation expression_lower_than(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Continuation expression_lower_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
 
             @Override
@@ -338,7 +338,7 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive(name = ">=")
-    public Continuation expression_greater_equal_than(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Continuation expression_greater_equal_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
 
             @Override
@@ -349,7 +349,7 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive(name = "=<")
-    public Continuation expression_lower_equal_than(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Continuation expression_lower_equal_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
 
             @Override
@@ -360,7 +360,7 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive(name = "=:=")
-    public Continuation expression_equals(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Continuation expression_equals(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
 
             @Override
@@ -371,7 +371,7 @@ public class CoreLibrary extends LibraryBase {
     }
 
     @Primitive(name = "=\\=")
-    public Continuation expression_not_equals(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Continuation expression_not_equals(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
 
             @Override
@@ -386,7 +386,7 @@ public class CoreLibrary extends LibraryBase {
     // ---------------------------------------------------------------------------
 
     @Primitive(name = "+")
-    public Term plus(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Term plus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         t1 = evaluateFunctor(theBindings, t1);
         t2 = evaluateFunctor(theBindings, t2);
         if (t1 instanceof TNumber && t2 instanceof TNumber) {
@@ -408,7 +408,7 @@ public class CoreLibrary extends LibraryBase {
      * @return Binary minus (subtract)
      */
     @Primitive(name = "-")
-    public Term minus(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Term minus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         t1 = evaluateFunctor(theBindings, t1);
         t2 = evaluateFunctor(theBindings, t2);
         if (t1 instanceof TNumber && t2 instanceof TNumber) {
@@ -429,7 +429,7 @@ public class CoreLibrary extends LibraryBase {
      * @return Binary multiply
      */
     @Primitive(name = "*")
-    public Term multiply(SolutionListener theListener, Bindings theBindings, Term t1, Term t2) {
+    public Term multiply(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         t1 = evaluateFunctor(theBindings, t1);
         t2 = evaluateFunctor(theBindings, t2);
         if (t1 instanceof TNumber && t2 instanceof TNumber) {
@@ -450,7 +450,7 @@ public class CoreLibrary extends LibraryBase {
      * @return Unary minus (negate)
      */
     @Primitive(name = "-")
-    public Term minus(SolutionListener theListener, Bindings theBindings, Term t1) {
+    public Term minus(SolutionListener theListener, Bindings theBindings, Object t1) {
         t1 = evaluateFunctor(theBindings, t1);
         if (t1 instanceof TNumber) {
             final TNumber val0n = (TNumber) t1;

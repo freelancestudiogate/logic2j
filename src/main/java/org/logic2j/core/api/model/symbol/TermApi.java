@@ -81,7 +81,7 @@ public class TermApi {
         */
     }
 
-    public static boolean isAtom(Term theTerm) {
+    public static boolean isAtom(Object theTerm) {
         if (theTerm instanceof Struct) {
             final Struct s = (Struct) theTerm;
             return s.getArity() == 0 || s.isEmptyList();
@@ -100,7 +100,7 @@ public class TermApi {
      * 
      * @param collection Recipient collection, {@link Term}s add here.
      */
-    public static void collectTermsInto(Term theTerm, Collection<Term> collection) {
+    public static void collectTermsInto(Object theTerm, Collection<Object> collection) {
         if (theTerm instanceof Struct) {
             ((Struct) theTerm).collectTermsInto(collection);
         } else if (theTerm instanceof Var) {
@@ -119,8 +119,8 @@ public class TermApi {
      * @param theTerm
      * @return A collection of terms, never empty. Same terms may appear multiple times.
      */
-    static Collection<Term> collectTerms(Term theTerm) {
-        final ArrayList<Term> recipient = new ArrayList<Term>();
+    static Collection<Object> collectTerms(Object theTerm) {
+        final ArrayList<Object> recipient = new ArrayList<Object>();
         collectTermsInto(theTerm, recipient);
         // Remove ourself from the result - we are always at the end of the collection
         recipient.remove(recipient.size() - 1);
@@ -134,8 +134,8 @@ public class TermApi {
      * @param theTerm
      * @return The factorized term, may be same as argument theTerm in case nothing was needed, or a new object.
      */
-    static Term factorize(Term theTerm) {
-        final Collection<Term> collection = collectTerms(theTerm);
+    static Object factorize(Object theTerm) {
+        final Collection<Object> collection = collectTerms(theTerm);
         return factorize(theTerm, collection);
     }
 
@@ -148,7 +148,7 @@ public class TermApi {
      * @param theCollectedTerms The reference Terms to search for.
      * @return Either this, or a new equivalent but factorized Term.
      */
-    public static Term factorize(Term theTerm, Collection<Term> collection) {
+    public static Object factorize(Object theTerm, Collection<Object> collection) {
         if (theTerm instanceof Struct) {
             return ((Struct) theTerm).factorize(collection);
         } else if (theTerm instanceof Var) {
@@ -167,7 +167,7 @@ public class TermApi {
      * @param theOther
      * @return true when theOther is structurally equal to this. Same references (==) will always yield true.
      */
-    public static boolean structurallyEquals(Term theTerm, Term theOther) {
+    public static boolean structurallyEquals(Object theTerm, Object theOther) {
         if (theTerm instanceof Struct) {
             return ((Struct) theTerm).structurallyEquals(theOther);
         } else if (theTerm instanceof Var) {
@@ -185,7 +185,7 @@ public class TermApi {
      * @param theVariableName
      * @return A {@link Var} with the specified name, or null when not found.
      */
-    public static Var findVar(Term theTerm, String theVariableName) {
+    public static Var findVar(Object theTerm, String theVariableName) {
         if (theTerm instanceof Struct) {
             return ((Struct) theTerm).findVar(theVariableName);
         } else if (theTerm instanceof Var) {
@@ -200,7 +200,7 @@ public class TermApi {
     /**
      * @return true if this Term denotes a Prolog list.
      */
-    public static boolean isList(Term theTerm) {
+    public static boolean isList(Object theTerm) {
         if (theTerm instanceof Struct) {
             return ((Struct) theTerm).isList();
         }
@@ -214,7 +214,7 @@ public class TermApi {
      * @param theIndexOfNextNonIndexedVar
      * @return The next value for theIndexOfNextNonIndexedVar, allow successive calls to increment.
      */
-    public static short assignIndexes(Term theTerm, short theIndexOfNextNonIndexedVar) {
+    public static short assignIndexes(Object theTerm, short theIndexOfNextNonIndexedVar) {
         if (theTerm instanceof Struct) {
             return ((Struct) theTerm).assignIndexes(theIndexOfNextNonIndexedVar);
         } else if (theTerm instanceof Var) {
@@ -232,7 +232,7 @@ public class TermApi {
      * @param theTerm
      * @return The number of variables found (recursively).
      */
-    static short assignIndexes(Term theTerm) {
+    static short assignIndexes(Object theTerm) {
         return TermApi.assignIndexes(theTerm, (short) 0); // Start assigning indexes with zero
     }
 
@@ -246,8 +246,8 @@ public class TermApi {
      *         variables. When no variables are bound, then the same refernce is returned. Important note: the caller cannot know if the
      *         returned reference was cloned or not, so it must never mutate it!
      */
-    public static Term substitute(Term theTerm, Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
-        if ((theTerm instanceof Struct && theTerm.index == 0) || theBindings.isEmpty()) {
+    public static Object substitute(Object theTerm, Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
+        if ((theTerm instanceof Struct && ((Struct) theTerm).index == 0) || theBindings.isEmpty()) {
             // No variables identified in the term, or no variables passed as argument: do not need to substitute
             return theTerm;
         }
@@ -275,13 +275,25 @@ public class TermApi {
      * @param theLibraryContent Defines primitives to be recognized
      * @return A normalized COPY of theTerm ready to be used for inference (in a Theory ore as a goal)
      */
-    public static Term normalize(Term theTerm, LibraryContent theLibraryContent) {
-        final Term factorized = factorize(theTerm);
+    public static Object normalize(Object theTerm, LibraryContent theLibraryContent) {
+        final Object factorized = factorize(theTerm);
         assignIndexes(factorized);
         if (factorized instanceof Struct && theLibraryContent != null) {
             ((Struct) factorized).assignPrimitiveInfo(theLibraryContent);
         }
         return factorized;
+    }
+
+    /**
+     * @param theTerm
+     * @return
+     */
+    public static Object cloneTerm(Object theTerm) {
+        if (theTerm instanceof Struct) {
+            return ((Struct) theTerm).cloneIt();
+        } else {
+            return theTerm; // not cloned
+        }
     }
 
     /**
@@ -367,7 +379,7 @@ public class TermApi {
      */
     // TODO Should this go to TermAdapter instead? - since we return a new Term
     @SuppressWarnings("unchecked")
-    public static <T extends Term> T selectTerm(Term theTerm, String theTPathExpression, Class<T> theClass) {
+    public static <T extends Object> T selectTerm(Object theTerm, String theTPathExpression, Class<T> theClass) {
         if (theTPathExpression.isEmpty()) {
             return ReflectUtils.safeCastNotNull("selecting term", theTerm, theClass);
         }

@@ -22,7 +22,6 @@ import org.logic2j.core.api.SolutionListener;
 import org.logic2j.core.api.model.Continuation;
 import org.logic2j.core.api.model.symbol.TLong;
 import org.logic2j.core.api.model.symbol.TNumber;
-import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.var.Bindings;
 import org.logic2j.core.impl.PrologImplementation;
 import org.logic2j.core.library.impl.LibraryBase;
@@ -39,7 +38,7 @@ public class AdHocLibraryForTesting extends LibraryBase {
     }
 
     @Primitive
-    public Continuation int_range(SolutionListener theListener, Bindings theBindings, Term theLowerBound, Term theIterable, Term theUpperBound) {
+    public Continuation int_range(SolutionListener theListener, Bindings theBindings, Object theLowerBound, Object theIterable, Object theUpperBound) {
         final Bindings b1 = theBindings.focus(theLowerBound, TNumber.class);
         assertValidBindings(b1, "int_range/3");
         final long lower = ((TNumber) b1.getReferrer()).longValue();

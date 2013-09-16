@@ -50,7 +50,7 @@ public class Binding implements Cloneable {
     // See description of fields in this class' Javadoc, and on getters.
 
     private BindingType type;
-    private Term term;
+    private Object term;
     private Bindings literalBindings;
     private Binding link;
 
@@ -75,7 +75,7 @@ public class Binding implements Cloneable {
      * @return This is used to return a pair (Term, Bindings) where needed.
      */
     // TODO assess if needed - used only once
-    public static Binding createLiteralBinding(Term theLiteral, Bindings theLiteralBindings) {
+    public static Binding createLiteralBinding(Object theLiteral, Bindings theLiteralBindings) {
         final Binding binding = new Binding();
         binding.type = BindingType.LITERAL;
         binding.link = null;
@@ -103,7 +103,7 @@ public class Binding implements Cloneable {
      * @param theFrame When theTerm is a literal, here are its current value bindings
      * @return true if a binding was done, false otherwise. Caller needs to know if future un-binding will be needed.
      */
-    public boolean bindTo(Term theTerm, Bindings theFrame) {
+    public boolean bindTo(Object theTerm, Bindings theFrame) {
         if (!isFree()) {
             throw new PrologNonSpecificError("Should never attempt to re-bind a Binding that is not free!");
         }
@@ -177,7 +177,7 @@ public class Binding implements Cloneable {
      * Reference to a bound term: for {@link BindingType#LITERAL}, this is the literal, for {@link BindingType#LINK}, it refers to the
      * {@link Term} of subclass {@link Var}.
      */
-    public Term getTerm() {
+    public Object getTerm() {
         return this.term;
     }
 

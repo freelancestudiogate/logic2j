@@ -32,7 +32,6 @@ import org.logic2j.core.api.TermAdapter.FactoryMode;
 import org.logic2j.core.api.model.Clause;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Bindings;
@@ -90,7 +89,7 @@ public class RDBClauseProvider extends RDBBase implements ClauseProvider {
         }
 
         for (int i = 0; i < theGoal.getArity(); i++) {
-            Term t = theGoal.getArg(i);
+            Object t = theGoal.getArg(i);
             if (t instanceof Var && theGoalBindings != null) {
                 t = TermApi.substitute(theGoal.getArg(i), theGoalBindings, null);
             }
@@ -125,7 +124,7 @@ public class RDBClauseProvider extends RDBBase implements ClauseProvider {
             builder.generateSelect();
             rows = new SqlRunner(getDataSource()).query(builder.getSql(), builder.getParameters());
             for (final Object[] row : rows) {
-                final Term[] args = new Term[row.length];
+                final Object[] args = new Object[row.length];
                 for (int i = 0; i < row.length; i++) {
                     final Object object = row[i];
                     args[i] = getTermAdapter().term(object, FactoryMode.ANY_TERM);

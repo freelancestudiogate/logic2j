@@ -55,7 +55,7 @@ public class DefaultSolver implements Solver {
         return solveGoalRecursive(theGoalBindings.getReferrer(), theGoalBindings, theSolutionListener);
     }
 
-    private Continuation solveGoalRecursive(final Term goalTerm, final Bindings theGoalBindings, final SolutionListener theSolutionListener) {
+    private Continuation solveGoalRecursive(final Object goalTerm, final Bindings theGoalBindings, final SolutionListener theSolutionListener) {
         if (debug) {
             logger.debug(">> Entering solveRecursive(\"{}\")", goalTerm);
         }
@@ -88,14 +88,14 @@ public class DefaultSolver implements Solver {
                     @Override
                     public Continuation onSolution() {
                         final int nextIndex = index + 1;
-                        final Term rhs = goalStruct.getArg(nextIndex); // Usually the right-hand-side of a binary ','
+                        final Object rhs = goalStruct.getArg(nextIndex); // Usually the right-hand-side of a binary ','
                         final Continuation continuationFromSubGoal = solveGoalRecursive(rhs, theGoalBindings, listeners[nextIndex]);
                         return continuationFromSubGoal;
                     }
                 };
             }
             // Solve the first goal, redirecting all solutions to the first listener defined above
-            final Term lhs = goalStruct.getArg(0);
+            final Object lhs = goalStruct.getArg(0);
             result = solveGoalRecursive(lhs, theGoalBindings, listeners[0]);
         } else if (Struct.FUNCTOR_SEMICOLON == functor) { // Names are {@link String#intern()}alized so OK to check by reference
 
@@ -120,12 +120,12 @@ public class DefaultSolver implements Solver {
             if (arity != 1) {
                 throw new InvalidTermException("Primitive 'call' accepts only one argument, got " + arity);
             }
-            final Term argumentOfCall = goalStruct.getArg(0);
+            final Object argumentOfCall = goalStruct.getArg(0);
             final Bindings effectiveGoalBindings = theGoalBindings.focus(argumentOfCall, Term.class);
             if (effectiveGoalBindings == null) {
                 throw new InvalidTermException("Argument to primitive 'call' may not be a free variable, was " + goalStruct.getArg(0));
             }
-            final Term target = effectiveGoalBindings.getReferrer();
+            final Object target = effectiveGoalBindings.getReferrer();
             if (debug) {
                 logger.debug("Invoking call({})", target);
             }
@@ -222,7 +222,7 @@ public class DefaultSolver implements Solver {
                                 }
                             } else {
                                 // Not a fact, it's a theorem - it has a body
-                                final Term newGoalTerm = clause.getBody();
+                                final Object newGoalTerm = clause.getBody();
                                 if (debug) {
                                     logger.debug("Clause {} is a theorem, clause's body is \"{}\"", clauseHead, newGoalTerm);
                                 }

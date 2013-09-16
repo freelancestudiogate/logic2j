@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.logic2j.core.api.TermExchanger;
-import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.var.Binding;
 import org.logic2j.core.api.model.var.Bindings;
 import org.logic2j.core.impl.DefaultTermExchanger;
@@ -85,8 +84,8 @@ public abstract class Term implements Serializable, Cloneable {
      * @param findWithin
      * @return The {@link Term} found or null when none found.
      */
-    protected Term findStructurallyEqualWithin(Collection<Term> findWithin) {
-        for (final Term term : findWithin) {
+    protected Object findStructurallyEqualWithin(Collection<Object> findWithin) {
+        for (final Object term : findWithin) {
             if (term != this && TermApi.structurallyEquals(term, this)) {
                 return term;
             }
@@ -105,22 +104,6 @@ public abstract class Term implements Serializable, Cloneable {
     // ---------------------------------------------------------------------------
     // Methods of java.lang.Object
     // ---------------------------------------------------------------------------
-
-    /**
-     * An equivalent to {@link #clone()} that does not throw the checked exception {@link CloneNotSupportedException}.
-     * 
-     * @return A deep copy of this Term.
-     */
-    @SuppressWarnings("unchecked")
-    // TODO LT: unclear why we get a warning. When calling clone() the compiler seems to know the return is Term!?
-    public <T extends Term> T cloneIt() {
-        try {
-            // This must always work since all children of Term are Cloneable!
-            return (T) clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new PrologNonSpecificError("Could not clone: " + e, e);
-        }
-    }
 
     /**
      * Delegate formatting to our basic {@link TermExchanger}.

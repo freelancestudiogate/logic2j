@@ -84,9 +84,9 @@ public class TermApiTest {
         //
         final Term clause = new Struct(Struct.FUNCTOR_CLAUSE, new Struct("a", Struct.valueOf("p", "X", "Y")), Struct.valueOf("p", "X", "Y"));
         logger.info("Flat terms of original {}", TermApi.collectTerms(clause));
-        final Term t2 = TermApi.normalize(clause, null);
-        logger.info("Found {} bindings", t2.getIndex());
-        assertEquals(2, t2.getIndex());
+        final Object t2 = TermApi.normalize(clause, null);
+        logger.info("Found {} bindings", ((Struct) t2).getIndex());
+        assertEquals(2, ((Struct) t2).getIndex());
         logger.info("Flat terms of copy     {}", TermApi.collectTerms(t2));
         assertEquals(clause.toString(), t2.toString());
     }
@@ -115,14 +115,14 @@ public class TermApiTest {
             // Expected to happen
         }
 
-        final Term a = this.prolog.getTermExchanger().unmarshall("a");
+        final Object a = this.prolog.getTermExchanger().unmarshall("a");
         // Empty binding yields same term since no bindings to resolve
         assertSame(a, TermApi.substitute(a, new Bindings(a), null));
 
         // Bindings without
         TermApi.substitute(a, new Bindings(a), null);
 
-        final Term x = this.prolog.getTermExchanger().unmarshall("X");
+        final Object x = this.prolog.getTermExchanger().unmarshall("X");
         TermApi.substitute(x, new Bindings(x), null);
     }
 
@@ -141,7 +141,7 @@ public class TermApiTest {
 
     @Test
     public void selectTerm() {
-        final Term term = this.prolog.getTermExchanger().unmarshall("a(b(c,c2),b2)");
+        final Object term = this.prolog.getTermExchanger().unmarshall("a(b(c,c2),b2)");
         //
         assertSame(term, TermApi.selectTerm(term, "", Struct.class));
         assertSame(term, TermApi.selectTerm(term, "a", Struct.class));

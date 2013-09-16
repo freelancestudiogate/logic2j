@@ -24,7 +24,6 @@ import org.logic2j.core.api.model.Continuation;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.TNumber;
-import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Binding;
 import org.logic2j.core.api.model.var.Bindings;
@@ -51,7 +50,7 @@ public class LibraryBase implements PLibrary {
      * @param theBindings2
      * @return The result of unification.
      */
-    protected boolean unify(Term t1, Bindings theBindings1, Term t2, Bindings theBindings2) {
+    protected boolean unify(Object t1, Bindings theBindings1, Object t2, Bindings theBindings2) {
         return getProlog().getUnifier().unify(t1, theBindings1, t2, theBindings2);
     }
 
@@ -105,7 +104,7 @@ public class LibraryBase implements PLibrary {
     }
 
     // TODO assess if needed - used only once
-    protected Binding dereferencedBinding(Term theTerm, Bindings theBindings) {
+    protected Binding dereferencedBinding(Object theTerm, Bindings theBindings) {
         if (theTerm instanceof Var) {
             return ((Var) theTerm).bindingWithin(theBindings).followLinks();
         }
@@ -115,7 +114,7 @@ public class LibraryBase implements PLibrary {
     /**
      * Evaluates an expression. Returns null value if the argument is not an evaluable expression
      */
-    protected Term evaluateFunctor(Bindings theBindings, Term theTerm) {
+    protected Object evaluateFunctor(Bindings theBindings, Object theTerm) {
         if (theTerm == null) {
             return null;
         }
@@ -147,19 +146,20 @@ public class LibraryBase implements PLibrary {
         return null;
     }
 
-    protected Term createConstantTerm(Object anyObject) {
+    protected Object createConstantTerm(Object anyObject) {
         if (anyObject == null) {
             return Var.ANONYMOUS_VAR;
         }
         return getProlog().getTermAdapter().term(anyObject, FactoryMode.ATOM);
     }
 
+    // Only one use!
     protected void unifyAndNotify(Var[] theVariables, Object[] theValues, Bindings theBindings, SolutionListener theListener) {
-        final Term[] values = new Term[theValues.length];
+        final Object[] values = new Object[theValues.length];
         for (int i = 0; i < theValues.length; i++) {
             values[i] = createConstantTerm(theValues[i]);
         }
-        final boolean unified = unify(new Struct("group", theVariables), theBindings, new Struct("group", values), theBindings);
+        final boolean unified = unify(new Struct("group", (Object[]) theVariables), theBindings, new Struct("group", values), theBindings);
         notifyIfUnified(unified, theListener);
     }
 

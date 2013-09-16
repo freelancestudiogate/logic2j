@@ -105,7 +105,7 @@ public class DefaultTheoryManager implements TheoryManager {
     private TheoryContent loadAllClauses(Parser theParser) {
         final TheoryContent content = new TheoryContent();
         Term clauseTerm = theParser.nextTerm(true);
-        Term specialInitializeGoalBody = null; // Body of the last clause whose head is "initialize"
+        Object specialInitializeGoalBody = null; // Body of the last clause whose head is "initialize"
         while (clauseTerm != null) {
             logger.debug("Parsed clause: {}", clauseTerm);
             final Clause cl = new Clause(this.prolog, clauseTerm);

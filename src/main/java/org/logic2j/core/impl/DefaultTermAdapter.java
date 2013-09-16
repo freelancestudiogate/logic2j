@@ -39,7 +39,7 @@ public class DefaultTermAdapter implements TermAdapter {
 
     // TODO be smarter to handle Arrays and Collections, and Iterables
     @Override
-    public Term term(Object theObject, FactoryMode theMode) {
+    public Object term(Object theObject, FactoryMode theMode) {
         // FIXME TEMPORARY JUST FOR COMPATIBILITY - move this to TermExchanger
         if (theObject instanceof CharSequence) {
             if (theMode == FactoryMode.ATOM) {
@@ -48,18 +48,18 @@ public class DefaultTermAdapter implements TermAdapter {
             throw new UnsupportedOperationException("TermAdapter cannot parse complex CharSequences, use TermExchanger instead");
         }
         final Term created = termFrom(theObject, theMode);
-        final Term normalized = TermApi.normalize(created, this.prolog.getLibraryManager().wholeContent());
+        final Object normalized = TermApi.normalize(created, this.prolog.getLibraryManager().wholeContent());
         return normalized;
     }
 
     @Override
-    public Term term(String thePredicateName, FactoryMode theMode, Object... theArguments) {
+    public Object term(String thePredicateName, FactoryMode theMode, Object... theArguments) {
         final Term[] convertedArgs = new Term[theArguments.length];
         for (int i = 0; i < theArguments.length; i++) {
             convertedArgs[i] = termFrom(theArguments[i], theMode);
         }
         final Term created = new Struct(thePredicateName, convertedArgs);
-        final Term normalized = TermApi.normalize(created, this.prolog.getLibraryManager().wholeContent());
+        final Object normalized = TermApi.normalize(created, this.prolog.getLibraryManager().wholeContent());
         return normalized;
     }
 
@@ -98,9 +98,9 @@ public class DefaultTermAdapter implements TermAdapter {
      * @return a List of one single Term from {@link #term(Object, org.logic2j.core.api.TermAdapter.FactoryMode)}.
      */
     @Override
-    public List<Term> terms(Object theObject, AssertionMode theAssertionMode) {
-        final List<Term> result = new ArrayList<Term>();
-        final Term term = term(theObject, FactoryMode.ATOM);
+    public List<Object> terms(Object theObject, AssertionMode theAssertionMode) {
+        final List<Object> result = new ArrayList<Object>();
+        final Object term = term(theObject, FactoryMode.ATOM);
         result.add(term);
         return result;
     }

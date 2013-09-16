@@ -53,7 +53,7 @@ public class Clause {
      * @param theProlog Required to normalize theClauseTerm according to the current libraries.
      * @param theClauseTerm
      */
-    public Clause(PrologImplementation theProlog, Term theClauseTerm) {
+    public Clause(PrologImplementation theProlog, Object theClauseTerm) {
         if (!(theClauseTerm instanceof Struct)) {
             throw new InvalidTermException("Need a Struct to build a clause, not " + theClauseTerm);
         }
@@ -85,7 +85,7 @@ public class Clause {
             return true;
         }
         // We know it's a clause functor, arity must be 2, check the body
-        final Term body = this.content.getRHS();
+        final Object body = this.content.getRHS();
         if (Struct.ATOM_TRUE.equals(body)) {
             return true;
         }
@@ -113,7 +113,7 @@ public class Clause {
     /**
      * @return The clause's body as a {@link Term}, normally a {@link Struct}.
      */
-    public Term getBody() {
+    public Object getBody() {
         if (isWithClauseFunctor()) {
             return this.content.getRHS();
         }

@@ -23,7 +23,6 @@ import java.util.Stack;
 import org.logic2j.core.api.Unifier;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.TNumber;
-import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Binding;
 import org.logic2j.core.api.model.var.Bindings;
@@ -37,10 +36,10 @@ public class DefaultUnifier implements Unifier {
     public int counter = 0;
 
     @Override
-    public boolean unify(Term term1, Bindings theBindings1, Term term2, Bindings theBindings2) {
+    public boolean unify(Object term1, Bindings theBindings1, Object term2, Bindings theBindings2) {
         this.counter++;
         // Remember where we were so that we can deunify
-        final boolean term1HasVars = term1.getIndex() > 0;
+        final boolean term1HasVars = term1 instanceof Struct && ((Struct) term1).getIndex() > 0;
         final Stack<ArrayList<Binding>> stack = term1HasVars ? BindingTrail.markBeforeAddingBindings() : BindingTrail.markBeforeAddingBindingsLazy();
         // Now attempt unifiation
         final boolean unified = unifyInternal(term1, theBindings1, term2, theBindings2);
@@ -63,7 +62,7 @@ public class DefaultUnifier implements Unifier {
      * @param theBindings2
      * @return true when unified, false when not (but partial changes might have been done to either {@link Bindings})
      */
-    private boolean unifyInternal(Term term1, Bindings theBindings1, Term term2, Bindings theBindings2) {
+    private boolean unifyInternal(Object term1, Bindings theBindings1, Object term2, Bindings theBindings2) {
         if (term1 == term2 && theBindings1 == theBindings2) {
             // Atoms now share the same address - we can optimize their unification.
             // Notice that due to factorization, struct such as [H|T] may also share the same location

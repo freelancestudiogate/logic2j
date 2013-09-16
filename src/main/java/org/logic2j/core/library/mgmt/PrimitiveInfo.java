@@ -90,7 +90,7 @@ public class PrimitiveInfo {
         args[i++] = theGoalVars;
         if (isVarargs()) {
             // All arguments as an array
-            final Term[] varargArray = new Term[arity];
+            final Object[] varargArray = new Object[arity];
             int j = 0;
             while (j < arity) {
                 varargArray[j] = theGoalStruct.getArg(j);

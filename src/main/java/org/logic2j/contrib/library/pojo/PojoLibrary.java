@@ -44,14 +44,14 @@ public class PojoLibrary extends LibraryBase {
     }
 
     @Primitive
-    public Continuation bind(final SolutionListener theListener, Bindings theBindings, Term theBindingName, Term theTarget) {
+    public Continuation bind(final SolutionListener theListener, Bindings theBindings, Object theBindingName, Object theTarget) {
         final Bindings nameBindings = theBindings.focus(theBindingName, Struct.class);
         assertValidBindings(nameBindings, "bind/2");
         final Struct nameTerm = (Struct) nameBindings.getReferrer();
 
         final String name = nameTerm.getName();
         final Object instance = extract(name);
-        final Term instanceTerm = createConstantTerm(instance);
+        final Object instanceTerm = createConstantTerm(instance);
         final boolean unified = unify(instanceTerm, nameBindings, theTarget, theBindings);
         return notifyIfUnified(unified, theListener);
     }

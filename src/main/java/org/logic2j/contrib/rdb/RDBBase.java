@@ -20,7 +20,6 @@ package org.logic2j.contrib.rdb;
 import javax.sql.DataSource;
 
 import org.logic2j.core.api.TermAdapter;
-import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.impl.DefaultTermAdapter;
 import org.logic2j.core.impl.PrologImplementation;
 
@@ -38,7 +37,7 @@ public class RDBBase {
         }
 
         @Override
-        public Term term(Object theObject, FactoryMode theMode) {
+        public Object term(Object theObject, FactoryMode theMode) {
             return super.term(theObject, FactoryMode.ATOM);
         }
 

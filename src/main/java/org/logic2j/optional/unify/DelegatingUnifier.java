@@ -57,7 +57,7 @@ public class DelegatingUnifier implements Unifier {
     }
 
     @Override
-    public boolean unify(Term term1, Bindings theBindings1, Term term2, Bindings theBindings2) {
+    public boolean unify(Object term1, Bindings theBindings1, Object term2, Bindings theBindings2) {
         for (final Method method : this.getClass().getMethods()) {
             if ("unify".equals(method.getName())) {
                 final Class<?>[] parameterTypes = method.getParameterTypes();

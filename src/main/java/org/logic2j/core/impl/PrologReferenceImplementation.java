@@ -113,12 +113,12 @@ public class PrologReferenceImplementation implements PrologImplementation {
 
     @Override
     public SolutionHolder solve(CharSequence theGoal) {
-        final Term parsed = getTermExchanger().unmarshall(theGoal);
+        final Object parsed = getTermExchanger().unmarshall(theGoal);
         return solve(parsed);
     }
 
     @Override
-    public SolutionHolder solve(Term theGoal) {
+    public SolutionHolder solve(Object theGoal) {
         final Bindings theBindings = new Bindings(theGoal);
         return new SolutionHolder(this, theBindings);
     }
