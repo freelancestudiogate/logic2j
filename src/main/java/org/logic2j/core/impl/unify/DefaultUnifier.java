@@ -17,15 +17,13 @@
  */
 package org.logic2j.core.impl.unify;
 
-import java.util.ArrayList;
-import java.util.Stack;
-
 import org.logic2j.core.api.Unifier;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Binding;
 import org.logic2j.core.api.model.var.Bindings;
+import org.logic2j.core.impl.unify.BindingTrail.StepInfo;
 import org.logic2j.core.impl.util.ReportUtils;
 
 /**
@@ -39,12 +37,11 @@ public class DefaultUnifier implements Unifier {
     public boolean unify(Object term1, Bindings theBindings1, Object term2, Bindings theBindings2) {
         this.counter++;
         // Remember where we were so that we can deunify
-        final boolean term1HasVars = term1 instanceof Struct && ((Struct) term1).getIndex() > 0;
-        final Stack<ArrayList<Binding>> stack = term1HasVars ? BindingTrail.markBeforeAddingBindings() : BindingTrail.markBeforeAddingBindingsLazy();
+        final StepInfo stepInfo = BindingTrail.markBeforeAddingBindings();
         // Now attempt unifiation
-        final boolean unified = unifyInternal(term1, theBindings1, term2, theBindings2);
+        final boolean unified = unifyInternal(stepInfo, term1, theBindings1, term2, theBindings2);
         if (!unified) {
-            BindingTrail.undoBindingsUntilPreviousMark(stack);
+            BindingTrail.undoBindingsUntilPreviousMark(stepInfo);
         }
         return unified;
     }
@@ -52,6 +49,8 @@ public class DefaultUnifier implements Unifier {
     /**
      * Starts the unification and recurse; this method DOES changes to both {@link Bindings} and could leave changes even if it eventually
      * cannot succeed and will return false. You MUST make sure to deunify if it returned false.
+     * 
+     * @param stepInfo
      * 
      * @note The Orientation of method arguments tends to be variables on term1 and literals on term2, but of course this method is
      *       symmetric. In the case of 2 free vars, term1 is linked to term2.
@@ -62,7 +61,7 @@ public class DefaultUnifier implements Unifier {
      * @param theBindings2
      * @return true when unified, false when not (but partial changes might have been done to either {@link Bindings})
      */
-    private boolean unifyInternal(Object term1, Bindings theBindings1, Object term2, Bindings theBindings2) {
+    private boolean unifyInternal(StepInfo stepInfo, Object term1, Bindings theBindings1, Object term2, Bindings theBindings2) {
         if (term1 == term2 && theBindings1 == theBindings2) {
             // Atoms now share the same address - we can optimize their unification.
             // Notice that due to factorization, struct such as [H|T] may also share the same location
@@ -71,7 +70,7 @@ public class DefaultUnifier implements Unifier {
         }
         if (term2 instanceof Var && !(term1 instanceof Var)) {
             // Prefer unifying Var to const so we swap args - this is purely conventional
-            return unifyInternal(term2, theBindings2, term1, theBindings1);
+            return unifyInternal(stepInfo, term2, theBindings2, term1, theBindings1);
         }
         if (term1 instanceof Var) {
             // Variable:
@@ -98,7 +97,7 @@ public class DefaultUnifier implements Unifier {
                 // We have followed term1 to end up with a literal. It may either unify or not depending if
                 // term2 is a Var or the same literal. To simplify implementation we recurse with the constant
                 // part as term2
-                return unifyInternal(term2, theBindings2, binding1.getTerm(), binding1.getLiteralBindings());
+                return unifyInternal(stepInfo, term2, theBindings2, binding1.getTerm(), binding1.getLiteralBindings());
             } else {
                 throw new IllegalStateException("Internal error, unexpected binding type for " + binding1);
             }
@@ -113,7 +112,7 @@ public class DefaultUnifier implements Unifier {
                 }
                 final int arity = s1.getArity();
                 for (int i = 0; i < arity; i++) {
-                    if (!unifyInternal(s1.getArg(i), theBindings1, s2.getArg(i), theBindings2)) {
+                    if (!unifyInternal(stepInfo, s1.getArg(i), theBindings1, s2.getArg(i), theBindings2)) {
                         return false;
                     }
                 }
