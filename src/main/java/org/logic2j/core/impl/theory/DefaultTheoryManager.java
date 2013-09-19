@@ -35,7 +35,6 @@ import org.logic2j.core.api.model.Continuation;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.var.Bindings;
 import org.logic2j.core.impl.PrologImplementation;
 import org.logic2j.core.impl.io.parse.tuprolog.Parser;
@@ -104,7 +103,7 @@ public class DefaultTheoryManager implements TheoryManager {
 
     private TheoryContent loadAllClauses(Parser theParser) {
         final TheoryContent content = new TheoryContent();
-        Term clauseTerm = theParser.nextTerm(true);
+        Object clauseTerm = theParser.nextTerm(true);
         Object specialInitializeGoalBody = null; // Body of the last clause whose head is "initialize"
         while (clauseTerm != null) {
             logger.debug("Parsed clause: {}", clauseTerm);

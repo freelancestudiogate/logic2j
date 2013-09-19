@@ -104,7 +104,7 @@ public final class Struct extends Term {
         setNameAndArity(theFunctor, theArity);
         // When arity is zero, don't even bother to allocate arguments!
         if (this.arity > 0) {
-            this.args = new Term[this.arity];
+            this.args = new Object[this.arity];
         }
     }
 
@@ -322,7 +322,7 @@ public final class Struct extends Term {
             throw new InvalidTermException("Could not clone: " + e, e);
         }
         t.setNameAndArity(this.name, this.arity);
-        t.args = new Term[this.arity];
+        t.args = new Object[this.arity];
         t.primitiveInfo = this.primitiveInfo;
         for (int i = 0; i < this.arity; i++) {
             t.args[i] = TermApi.cloneTerm(this.args[i]);
@@ -542,7 +542,7 @@ public final class Struct extends Term {
             elements.add(runningElement.getLHS());
             runningElement = (Struct) runningElement.getRHS();
         }
-        return new Struct(((Struct) functor).name, elements.toArray(new Term[0]));
+        return new Struct(((Struct) functor).name, (Object[]) elements.toArray(new Object[elements.size()]));
     }
 
     @SuppressWarnings("unchecked")
@@ -582,7 +582,7 @@ public final class Struct extends Term {
         assertPList(this);
         if (isEmptyList()) {
             setNameAndArity(FUNCTOR_LIST, 2);
-            this.args = new Term[this.arity];
+            this.args = new Object[this.arity];
             this.args[0] = t;
             this.args[1] = Struct.EMPTY_LIST;
         } else if (TermApi.isList(this.args[1])) {

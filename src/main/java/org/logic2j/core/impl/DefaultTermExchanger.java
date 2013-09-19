@@ -258,7 +258,7 @@ public class DefaultTermExchanger implements TermExchanger {
     @Override
     public Object unmarshall(CharSequence theChars) {
         final Parser parser = new Parser(this.prolog.getOperatorManager(), theChars.toString());
-        final Term parsed = parser.parseSingleTerm();
+        final Object parsed = parser.parseSingleTerm();
         final Object normalized = TermApi.normalize(parsed, this.prolog.getLibraryManager().wholeContent());
         return normalized;
     }

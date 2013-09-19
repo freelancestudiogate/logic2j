@@ -40,6 +40,9 @@ ac(4,fourteen).
 ac(5,15).
 ac(6,sixteen).
 
+dbl(1.1).
+dbl(1.2).
+dbl(1.3).
 
 % -----------------------------
 % More testing of cut behaviour

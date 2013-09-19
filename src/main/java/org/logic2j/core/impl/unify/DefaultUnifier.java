@@ -125,7 +125,8 @@ public class DefaultUnifier implements Unifier {
             }
             return false;
         } else {
-            throw new IllegalStateException("Internal bug, term1 is of unexpected " + term1.getClass());
+            return term1.equals(term2);
+            // throw new IllegalStateException("Internal bug, term1 is of unexpected " + term1.getClass());
         }
     }
 

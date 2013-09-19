@@ -42,7 +42,6 @@ import java.util.regex.Pattern;
 import org.logic2j.core.api.model.OperatorManager;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TDouble;
 import org.logic2j.core.api.model.symbol.TLong;
 import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Term;
@@ -84,9 +83,9 @@ public class Parser {
 
     private static class IdentifiedTerm {
         int priority;
-        Term result;
+        Object result;
 
-        public IdentifiedTerm(int thePriority, Term theResult) {
+        public IdentifiedTerm(int thePriority, Object theResult) {
             this.priority = thePriority;
             this.result = theResult;
         }
@@ -112,7 +111,7 @@ public class Parser {
      * @throws InvalidTermException if a syntax error is found.
      */
     // TODO I would prefer that the parser exposes an Iterable instead of a direct method
-    public Term nextTerm(boolean endNeeded) throws InvalidTermException {
+    public Object nextTerm(boolean endNeeded) throws InvalidTermException {
         try {
             final Token t = this.tokenizer.readToken();
             if (t.isEOF()) {
@@ -120,7 +119,7 @@ public class Parser {
             }
 
             this.tokenizer.unreadToken(t);
-            final Term term = expr(false);
+            final Object term = expr(false);
             if (term == null) {
                 throw new InvalidTermException("The parser was unable to finish.");
             }
@@ -135,14 +134,14 @@ public class Parser {
         }
     }
 
-    public Term parseSingleTerm() throws InvalidTermException {
+    public Object parseSingleTerm() throws InvalidTermException {
         try {
             final Token t = this.tokenizer.readToken();
             if (t.isEOF()) {
                 throw new InvalidTermException("Term starts with EOF");
             }
             this.tokenizer.unreadToken(t);
-            final Term term = expr(false);
+            final Object term = expr(false);
             if (term == null) {
                 throw new InvalidTermException("Term is null");
             }
@@ -159,7 +158,7 @@ public class Parser {
     // internal parsing procedures
     // ---------------------------------------------------------------------------
 
-    private Term expr(boolean commaIsEndMarker) throws InvalidTermException, IOException {
+    private Object expr(boolean commaIsEndMarker) throws InvalidTermException, IOException {
         return exprA(Operator.OP_HIGH, commaIsEndMarker).result;
     }
 
@@ -187,7 +186,7 @@ public class Parser {
 
             // VERY VERY PROTOTYPICAL - SHOULD ACTUALLY NOT BE USED
             if (yfy >= yfx && yfy >= yf && yfy >= Operator.OP_LOW) {
-                final List<Term> elements = new ArrayList<Term>();
+                final List<Object> elements = new ArrayList<Object>();
                 elements.add(leftSide.result);
                 final String functor = oper.text;
                 while (yfy >= yfx && yfy >= yf && yfy >= Operator.OP_LOW) {
@@ -205,7 +204,7 @@ public class Parser {
                     }
                 }
                 logger.info("Stop loop, found so far: {}", elements);
-                return new IdentifiedTerm(yfy, new Struct(functor, elements.toArray(new Term[elements.size()])));
+                return new IdentifiedTerm(yfy, new Struct(functor, elements.toArray(new Object[elements.size()])));
             }
 
             // YFX has priority over YF
@@ -360,7 +359,7 @@ public class Parser {
         return new IdentifiedTerm(0, exprA0());
     }
 
-    private Term exprA0() throws InvalidTermException, IOException {
+    private Object exprA0() throws InvalidTermException, IOException {
         final Token t1 = this.tokenizer.readToken();
 
         if (t1.isType(INTEGER)) {
@@ -389,16 +388,16 @@ public class Parser {
                                                                                                                                             // be
                                                                                                                                             // skipped
             }
-            final LinkedList<Term> a = exprA0_arglist(); // reading arguments
+            final LinkedList<Object> a = exprA0_arglist(); // reading arguments
             final Token t3 = this.tokenizer.readToken();
             if (t3.isType(RPAR)) {
-                return new Struct(functor, a.toArray(new Term[0]));
+                return new Struct(functor, a.toArray(new Object[a.size()]));
             }
             throw new InvalidTermException("Missing right parenthesis: (" + a + " -> here <-");
         }
 
         if (t1.isType(LPAR)) {
-            final Term term = expr(false);
+            final Object term = expr(false);
             if (this.tokenizer.readToken().isType(RPAR)) {
                 return term;
             }
@@ -426,7 +425,7 @@ public class Parser {
             }
 
             this.tokenizer.unreadToken(t2);
-            final Term arg = expr(false);
+            final Object arg = expr(false);
             t2 = this.tokenizer.readToken();
             if (t2.isType(RBRA2)) {
                 return new Struct("{}", arg);
@@ -438,7 +437,7 @@ public class Parser {
     }
 
     private Term exprA0_list() throws InvalidTermException, IOException {
-        final Term head = expr(true);
+        final Object head = expr(true);
         final Token t = this.tokenizer.readToken();
         if (Struct.LIST_SEPARATOR.equals(t.text)) {
             return Struct.createPList(head, exprA0_list());
@@ -453,17 +452,17 @@ public class Parser {
         throw new InvalidTermException("The expression: \"" + head + "\" is not followed by either a ',' or '|'  or ']'.");
     }
 
-    private LinkedList<Term> exprA0_arglist() throws InvalidTermException, IOException {
-        final Term head = expr(true);
+    private LinkedList<Object> exprA0_arglist() throws InvalidTermException, IOException {
+        final Object head = expr(true);
         final Token t = this.tokenizer.readToken();
         if (Struct.LIST_SEPARATOR.equals(t.text)) {
-            final LinkedList<Term> l = exprA0_arglist();
+            final LinkedList<Object> l = exprA0_arglist();
             l.addFirst(head);
             return l;
         }
         if (")".equals(t.text)) {
             this.tokenizer.unreadToken(t);
-            final LinkedList<Term> l = new LinkedList<Term>();
+            final LinkedList<Object> l = new LinkedList<Object>();
             l.add(head);
             return l;
         }
@@ -477,12 +476,13 @@ public class Parser {
         return new TLong(num);
     }
 
-    TDouble parseFloat(String s) {
-        final double num = Double.parseDouble(s);
-        return new TDouble(num);
+    Double parseFloat(String s) {
+        // final double num = Double.parseDouble(s);
+        // return new TDouble(num);
+        return Double.valueOf(s);
     }
 
-    TNumber createNumber(String s) {
+    Object createNumber(String s) {
         try {
             return parseInteger(s);
         } catch (final Exception e) {

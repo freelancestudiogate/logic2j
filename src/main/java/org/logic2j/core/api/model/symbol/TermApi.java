@@ -28,7 +28,7 @@ import java.util.List;
 import org.logic2j.core.api.TermAdapter;
 import org.logic2j.core.api.TermAdapter.FactoryMode;
 import org.logic2j.core.api.TermExchanger;
-import org.logic2j.core.api.model.TermVisitor;
+import org.logic2j.core.api.model.PartialTermVisitor;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.var.Binding;
@@ -51,7 +51,7 @@ public class TermApi {
         // Forbid instantiation
     }
 
-    public static <T> T accept(Object theTerm, TermVisitor<T> theVisitor) {
+    public static <T> T accept(Object theTerm, PartialTermVisitor<T> theVisitor) {
         // TermVisitor
         if (theTerm instanceof Struct) {
             return theVisitor.visit((Struct) theTerm);
@@ -65,8 +65,7 @@ public class TermApi {
         if (theTerm instanceof TDouble) {
             return theVisitor.visit((TDouble) theTerm);
         }
-        throw new PrologNonSpecificError("Should not happen here");
-        /*
+        // throw new PrologNonSpecificError("Should not happen here");
         // Extension
         if (theTerm instanceof String) {
             return theVisitor.visit((String) theTerm);
@@ -78,7 +77,6 @@ public class TermApi {
             return theVisitor.visit((Double) theTerm);
         }
         return theVisitor.visit(theTerm);
-        */
     }
 
     public static boolean isAtom(Object theTerm) {
@@ -108,7 +106,7 @@ public class TermApi {
         } else if (theTerm instanceof TNumber) {
             ((TNumber) theTerm).collectTermsInto(collection);
         } else {
-            throw new PrologNonSpecificError("Should not happen here");
+            // Not a Term but a plain Java object - won't collect
         }
     }
 
@@ -156,7 +154,8 @@ public class TermApi {
         } else if (theTerm instanceof TNumber) {
             return ((TNumber) theTerm).factorize(collection);
         } else {
-            throw new PrologNonSpecificError("Should not happen here");
+            // Not a Term but a plain Java object - won't factorize
+            return theTerm;
         }
     }
 
@@ -222,7 +221,8 @@ public class TermApi {
         } else if (theTerm instanceof TNumber) {
             return ((TNumber) theTerm).assignIndexes(theIndexOfNextNonIndexedVar);
         } else {
-            throw new PrologNonSpecificError("Should not happen here");
+            // Not a Term but a plain Java object - can't assign an index
+            return theIndexOfNextNonIndexedVar;
         }
     }
 
@@ -311,11 +311,11 @@ public class TermApi {
      * @return An instance of a subclass of {@link Term}.
      * @throws InvalidTermException If theObject cannot be converted to a Term
      */
-    public static Term valueOf(Object theObject, FactoryMode theMode) throws InvalidTermException {
+    public static Object valueOf(Object theObject, FactoryMode theMode) throws InvalidTermException {
         if (theObject == null) {
             throw new InvalidTermException("Cannot create Term from a null argument");
         }
-        final Term result;
+        final Object result;
         if (theObject instanceof Term) {
             // Idempotence
             result = (Term) theObject;
@@ -324,9 +324,9 @@ public class TermApi {
         } else if (theObject instanceof Long) {
             result = new TLong((Long) theObject);
         } else if (theObject instanceof Double) {
-            result = new TDouble((Double) theObject);
+            result = (Double) theObject;
         } else if (theObject instanceof Float) {
-            result = new TDouble((Float) theObject);
+            result = Double.valueOf(((Float) theObject).doubleValue());
         } else if (theObject instanceof Boolean) {
             result = (Boolean) theObject ? Struct.ATOM_TRUE : Struct.ATOM_FALSE;
         } else if (theObject instanceof CharSequence || theObject instanceof Character) {
@@ -358,7 +358,7 @@ public class TermApi {
             final Number nbr = (Number) theObject;
             if (nbr.doubleValue() % 1 != 0) {
                 // Has floating point number
-                result = new TDouble(nbr.doubleValue());
+                result = Double.valueOf(nbr.doubleValue());
             } else {
                 // Is just an integer
                 result = new TLong(nbr.longValue());

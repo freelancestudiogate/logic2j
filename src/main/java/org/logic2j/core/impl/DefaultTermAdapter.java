@@ -47,14 +47,14 @@ public class DefaultTermAdapter implements TermAdapter {
             }
             throw new UnsupportedOperationException("TermAdapter cannot parse complex CharSequences, use TermExchanger instead");
         }
-        final Term created = termFrom(theObject, theMode);
+        final Object created = termFrom(theObject, theMode);
         final Object normalized = TermApi.normalize(created, this.prolog.getLibraryManager().wholeContent());
         return normalized;
     }
 
     @Override
     public Object term(String thePredicateName, FactoryMode theMode, Object... theArguments) {
-        final Term[] convertedArgs = new Term[theArguments.length];
+        final Object[] convertedArgs = new Object[theArguments.length];
         for (int i = 0; i < theArguments.length; i++) {
             convertedArgs[i] = termFrom(theArguments[i], theMode);
         }
@@ -70,8 +70,8 @@ public class DefaultTermAdapter implements TermAdapter {
      * @param theMode
      * @return An instance of Term
      */
-    protected Term termFrom(Object theObject, FactoryMode theMode) {
-        Term result = null;
+    protected Object termFrom(Object theObject, FactoryMode theMode) {
+        Object result = null;
         if (theObject == null) {
             if (theMode == FactoryMode.ATOM) {
                 result = new Struct(""); // The empty string atom, see note on FactoryMode.ATOM
