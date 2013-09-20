@@ -102,6 +102,11 @@ public class TermApiTest {
         assertEquals(1, nbVars);
         nbVars = TermApi.assignIndexes(new Var("_"));
         assertEquals(0, nbVars);
+        //
+        nbVars = TermApi.assignIndexes(Long.valueOf(2));
+        assertEquals(0, nbVars);
+        nbVars = TermApi.assignIndexes(Double.valueOf(1.1));
+        assertEquals(0, nbVars);
     }
 
     // FIXME works fine when run alone, or with class, but fails when running all test cases at the same time!
