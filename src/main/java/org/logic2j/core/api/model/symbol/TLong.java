@@ -36,6 +36,11 @@ public final class TLong extends TNumber {
     }
 
     @Override
+    public Number toNumber() {
+        return this.value;
+    }
+
+    @Override
     final public double doubleValue() {
         return this.value;
     }

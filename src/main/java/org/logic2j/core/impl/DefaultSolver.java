@@ -57,7 +57,7 @@ public class DefaultSolver implements Solver {
 
     private Continuation solveGoalRecursive(final Object goalTerm, final Bindings theGoalBindings, final SolutionListener theSolutionListener) {
         if (debug) {
-            logger.debug(">> Entering solveRecursive(\"{}\")", goalTerm);
+            logger.debug(">> Entering solveRecursive(\"{}\") with {}", goalTerm, theGoalBindings);
         }
         if (!(goalTerm instanceof Struct)) {
             throw new InvalidTermException("Goal \"" + goalTerm + "\" is not a Struct and cannot be solved");
@@ -79,14 +79,18 @@ public class DefaultSolver implements Solver {
             // Allocates N-1 listeners, usually this means one.
             // On solution, each will trigger solving of the next term
             if (debug) {
-                logger.debug("Handing AND, arity={}", arity);
+                logger.debug("Handling AND, arity={}", arity);
             }
+            final Object lhs = goalStruct.getArg(0);
             for (int i = 0; i < arity - 1; i++) {
                 final int index = i;
                 listeners[index] = new SolutionListener() {
 
                     @Override
                     public Continuation onSolution() {
+                        if (debug) {
+                            logger.debug("AND's internal solution listener called for {} with {}", lhs, theGoalBindings);
+                        }
                         final int nextIndex = index + 1;
                         final Object rhs = goalStruct.getArg(nextIndex); // Usually the right-hand-side of a binary ','
                         final Continuation continuationFromSubGoal = solveGoalRecursive(rhs, theGoalBindings, listeners[nextIndex]);
@@ -95,10 +99,11 @@ public class DefaultSolver implements Solver {
                 };
             }
             // Solve the first goal, redirecting all solutions to the first listener defined above
-            final Object lhs = goalStruct.getArg(0);
             result = solveGoalRecursive(lhs, theGoalBindings, listeners[0]);
         } else if (Struct.FUNCTOR_SEMICOLON == functor) { // Names are {@link String#intern()}alized so OK to check by reference
-
+            if (debug) {
+                logger.debug("Handling OR, arity={}", arity);
+            }
             /*
             * This is the Java implementation of N-arity OR
             * We can also implement a binary OR directly in Prolog using
@@ -180,7 +185,7 @@ public class DefaultSolver implements Solver {
                         break;
                     }
                     if (debug) {
-                        logger.debug("Trying clause \"{}\", current status={}", clause, result);
+                        logger.debug("Trying clause {}, current status={}", clause, result);
                     }
 
                     // Clone the variables so that we won't mutate our current clause's ones
@@ -192,8 +197,8 @@ public class DefaultSolver implements Solver {
 
                     final Term clauseHead = clause.getHead();
                     if (debug) {
-                        logger.debug("Unifying: goal={}        with  goalVars={}", goalTerm, theGoalBindings);
-                        logger.debug("      to: clauseHead={}  with  clauseVars={}", clauseHead, clauseVars);
+                        logger.debug(" Unifying goal  : {}   with   {}", goalTerm, theGoalBindings);
+                        logger.debug("  to clause head: {}   with   {}", clauseHead, clauseVars);
                     }
 
                     // Now unify - this is the only place where free variables may become bound, and
@@ -202,7 +207,7 @@ public class DefaultSolver implements Solver {
                     // As a consequence, deunification can happen immediately afterwards, in this method, not outside in the caller
                     final boolean headUnified = unifier.unify(goalTerm, theGoalBindings, clauseHead, clauseVars);
                     if (debug) {
-                        logger.debug("  result=" + headUnified + ", goalVars={}, clauseVars={}", theGoalBindings, clauseVars);
+                        logger.debug(" headUnified=" + headUnified + ", now: goal {}, clause {}", theGoalBindings, clauseVars);
                     }
 
                     if (headUnified) {
@@ -224,12 +229,12 @@ public class DefaultSolver implements Solver {
                                 // Not a fact, it's a theorem - it has a body
                                 final Object newGoalTerm = clause.getBody();
                                 if (debug) {
-                                    logger.debug("Clause {} is a theorem, clause's body is \"{}\"", clauseHead, newGoalTerm);
+                                    logger.debug("Clause {} is a theorem whose body is {}", clauseHead, newGoalTerm);
                                 }
                                 // Solve the body in our current subFrame
                                 continuation = solveGoalRecursive(newGoalTerm, clauseVars, theSolutionListener);
                                 if (debug) {
-                                    logger.debug("  back to clause \"{}\" with continuation={}", clause, continuation);
+                                    logger.debug("  back to clause {} with continuation={}", clause, continuation);
                                 }
                                 if (continuation == Continuation.USER_ABORT) {
                                     // TODO should we just "return" from here?
@@ -273,7 +278,7 @@ public class DefaultSolver implements Solver {
 
         }
         if (debug) {
-            logger.debug("<< Exit    solveGoalRecursive(\"{}\") with {}", goalTerm, result);
+            logger.debug("<< Exit    solveGoalRecursive(\"{}\") with {}, continuation=" + result, goalTerm, theGoalBindings);
         }
         return result;
     }

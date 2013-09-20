@@ -138,10 +138,12 @@ public class DefaultLibraryManager implements LibraryManager {
                 final PrimitiveType type;
                 if (Continuation.class.equals(returnType)) {
                     type = PrimitiveType.PREDICATE;
-                } else if (Term.class.equals(returnType)) {
-                    type = PrimitiveType.FUNCTOR;
                 } else if (Void.TYPE.equals(returnType)) {
                     type = PrimitiveType.DIRECTIVE;
+                } else if (Term.class.equals(returnType)) {
+                    type = PrimitiveType.FUNCTOR;
+                } else if (Object.class.equals(returnType)) {
+                    type = PrimitiveType.FUNCTOR;
                 } else {
                     throw new PrologNonSpecificError("Unexpected return type " + returnType.getName() + " for primitive " + annotation);
                 }

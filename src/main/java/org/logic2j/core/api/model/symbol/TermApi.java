@@ -107,6 +107,7 @@ public class TermApi {
             ((TNumber) theTerm).collectTermsInto(collection);
         } else {
             // Not a Term but a plain Java object - won't collect
+            collection.add(theTerm);
         }
     }
 
@@ -174,7 +175,8 @@ public class TermApi {
         } else if (theTerm instanceof TNumber) {
             return ((TNumber) theTerm).structurallyEquals(theOther);
         } else {
-            throw new PrologNonSpecificError("Should not happen here");
+            // Not a Term but a plain Java object - calculate equality
+            return theTerm.equals(theOther);
         }
     }
 
@@ -192,7 +194,8 @@ public class TermApi {
         } else if (theTerm instanceof TNumber) {
             return ((TNumber) theTerm).findVar(theVariableName);
         } else {
-            throw new PrologNonSpecificError("Should not happen here");
+            // Not a Term but a plain Java object - no var
+            return null;
         }
     }
 
@@ -256,9 +259,10 @@ public class TermApi {
         } else if (theTerm instanceof Var) {
             return ((Var) theTerm).substitute(theBindings, theBindingsToVars);
         } else if (theTerm instanceof TNumber) {
-            return ((TNumber) theTerm).substitute(theBindings, theBindingsToVars);
+            return theTerm;
         } else {
-            throw new PrologNonSpecificError("Should not happen here");
+            // Not a Term but a plain Java object - can't assign an index
+            return theTerm;
         }
     }
 
@@ -320,9 +324,9 @@ public class TermApi {
             // Idempotence
             result = (Term) theObject;
         } else if (theObject instanceof Integer) {
-            result = new TLong((Integer) theObject);
+            result = Long.valueOf(((Integer) theObject).longValue());
         } else if (theObject instanceof Long) {
-            result = new TLong((Long) theObject);
+            result = (Long) theObject;
         } else if (theObject instanceof Double) {
             result = (Double) theObject;
         } else if (theObject instanceof Float) {
@@ -361,7 +365,7 @@ public class TermApi {
                 result = Double.valueOf(nbr.doubleValue());
             } else {
                 // Is just an integer
-                result = new TLong(nbr.longValue());
+                result = Long.valueOf(nbr.longValue());
             }
         } else {
             throw new InvalidTermException("Cannot create Term from '" + theObject + "' of " + theObject.getClass());

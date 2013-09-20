@@ -130,6 +130,10 @@ public class LibraryBase implements PLibrary {
         if (theTerm instanceof TNumber) {
             return theTerm;
         }
+        // Temporarily for plain Java numbers - but we should anyway return other objects too
+        if (theTerm instanceof Number) {
+            return theTerm;
+        }
         if (theTerm instanceof Struct) {
             final Struct struct = (Struct) theTerm;
             final PrimitiveInfo desc = struct.getPrimitiveInfo();
@@ -141,8 +145,10 @@ public class LibraryBase implements PLibrary {
                 // throw new IllegalArgumentException("Predicate's functor " + struct.getName() + " is a primitive, but not a functor");
                 return null;
             }
-            return desc.invokeFunctor(struct, theBindings);
+            final Object result = desc.invoke(struct, theBindings, /* no listener */null);
+            return result;
         }
+        // FIXME shouldn't we return theTerm?
         return null;
     }
 

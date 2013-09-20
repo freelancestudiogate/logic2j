@@ -139,7 +139,7 @@ public class CoreLibrary extends LibraryBase {
         assertValidBindings(atomBindings, "atom_length/2");
         final Struct atom = (Struct) atomBindings.getReferrer();
 
-        final TLong atomLength = new TLong((long) atom.getName().length());
+        final Long atomLength = Long.valueOf((long) atom.getName().length());
         final boolean unified = unify(atomLength, atomBindings, theLength, theBindings);
         return notifyIfUnified(unified, theListener);
     }
@@ -286,8 +286,8 @@ public class CoreLibrary extends LibraryBase {
     // Binary numeric predicates
     // ---------------------------------------------------------------------------
 
-    private static interface TNumberBinaryClosure {
-        boolean apply(TNumber val1, TNumber val2);
+    private static interface NumberBinaryClosure {
+        boolean apply(Number val1, Number val2);
     }
 
     /**
@@ -300,13 +300,20 @@ public class CoreLibrary extends LibraryBase {
      * @param theEvaluationFunction
      * @return
      */
-    private Continuation binaryNumericPredicate(SolutionListener theListener, Bindings theBindings, Object t1, Object t2, TNumberBinaryClosure theEvaluationFunction) {
+    private Continuation binaryNumericPredicate(SolutionListener theListener, Bindings theBindings, Object t1, Object t2, NumberBinaryClosure theEvaluationFunction) {
         final Object effectiveT1 = evaluateFunctor(theBindings, t1);
         final Object effectiveT2 = evaluateFunctor(theBindings, t2);
         Continuation continuation = Continuation.CONTINUE;
+        if (effectiveT1 instanceof Number && effectiveT2 instanceof Number) {
+            final boolean condition = theEvaluationFunction.apply((Number) effectiveT1, (Number) effectiveT2);
+            if (condition) {
+                continuation = notifySolution(theListener);
+            }
+            return continuation;
+        }
         if (effectiveT1 instanceof TNumber && effectiveT2 instanceof TNumber) {
-            final TNumber value1 = (TNumber) effectiveT1;
-            final TNumber value2 = (TNumber) effectiveT2;
+            final Number value1 = ((TNumber) effectiveT1).toNumber();
+            final Number value2 = ((TNumber) effectiveT2).toNumber();
             final boolean condition = theEvaluationFunction.apply(value1, value2);
             if (condition) {
                 continuation = notifySolution(theListener);
@@ -317,10 +324,10 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = ">")
     public Continuation expression_greater_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
+        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
 
             @Override
-            public boolean apply(TNumber val1, TNumber val2) {
+            public boolean apply(Number val1, Number val2) {
                 return val1.doubleValue() > val2.doubleValue();
             }
         });
@@ -328,10 +335,10 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = "<")
     public Continuation expression_lower_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
+        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
 
             @Override
-            public boolean apply(TNumber val1, TNumber val2) {
+            public boolean apply(Number val1, Number val2) {
                 return val1.doubleValue() < val2.doubleValue();
             }
         });
@@ -339,10 +346,10 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = ">=")
     public Continuation expression_greater_equal_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
+        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
 
             @Override
-            public boolean apply(TNumber val1, TNumber val2) {
+            public boolean apply(Number val1, Number val2) {
                 return val1.doubleValue() >= val2.doubleValue();
             }
         });
@@ -350,10 +357,10 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = "=<")
     public Continuation expression_lower_equal_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
+        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
 
             @Override
-            public boolean apply(TNumber val1, TNumber val2) {
+            public boolean apply(Number val1, Number val2) {
                 return val1.doubleValue() <= val2.doubleValue();
             }
         });
@@ -361,10 +368,10 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = "=:=")
     public Continuation expression_equals(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
+        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
 
             @Override
-            public boolean apply(TNumber val1, TNumber val2) {
+            public boolean apply(Number val1, Number val2) {
                 return val1.doubleValue() == val2.doubleValue();
             }
         });
@@ -372,10 +379,10 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = "=\\=")
     public Continuation expression_not_equals(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new TNumberBinaryClosure() {
+        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
 
             @Override
-            public boolean apply(TNumber val1, TNumber val2) {
+            public boolean apply(Number val1, Number val2) {
                 return val1.doubleValue() != val2.doubleValue();
             }
         });
@@ -386,9 +393,16 @@ public class CoreLibrary extends LibraryBase {
     // ---------------------------------------------------------------------------
 
     @Primitive(name = "+")
-    public Term plus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
+    public Object plus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         t1 = evaluateFunctor(theBindings, t1);
         t2 = evaluateFunctor(theBindings, t2);
+        if (t1 instanceof Number && t2 instanceof Number) {
+            if (t1 instanceof Long && t2 instanceof Long) {
+                return ((Long) t1).longValue() + ((Long) t2).longValue();
+            } else {
+                return ((Double) t1).longValue() + ((Double) t2).longValue();
+            }
+        }
         if (t1 instanceof TNumber && t2 instanceof TNumber) {
             final TNumber val0n = (TNumber) t1;
             final TNumber val1n = (TNumber) t2;
@@ -408,9 +422,16 @@ public class CoreLibrary extends LibraryBase {
      * @return Binary minus (subtract)
      */
     @Primitive(name = "-")
-    public Term minus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
+    public Object minus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         t1 = evaluateFunctor(theBindings, t1);
         t2 = evaluateFunctor(theBindings, t2);
+        if (t1 instanceof Number && t2 instanceof Number) {
+            if (t1 instanceof Long && t2 instanceof Long) {
+                return Long.valueOf(((Long) t1).longValue() - ((Long) t2).longValue());
+            } else {
+                return Double.valueOf(((Double) t1).longValue() - ((Double) t2).longValue());
+            }
+        }
         if (t1 instanceof TNumber && t2 instanceof TNumber) {
             final TNumber val0n = (TNumber) t1;
             final TNumber val1n = (TNumber) t2;
@@ -429,9 +450,16 @@ public class CoreLibrary extends LibraryBase {
      * @return Binary multiply
      */
     @Primitive(name = "*")
-    public Term multiply(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
+    public Object multiply(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
         t1 = evaluateFunctor(theBindings, t1);
         t2 = evaluateFunctor(theBindings, t2);
+        if (t1 instanceof Number && t2 instanceof Number) {
+            if (t1 instanceof Long && t2 instanceof Long) {
+                return Long.valueOf(((Long) t1).longValue() * ((Long) t2).longValue());
+            } else {
+                return Double.valueOf(((Double) t1).longValue() * ((Double) t2).longValue());
+            }
+        }
         if (t1 instanceof TNumber && t2 instanceof TNumber) {
             final TNumber val0n = (TNumber) t1;
             final TNumber val1n = (TNumber) t2;

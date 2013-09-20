@@ -231,7 +231,7 @@ public class Bindings {
      * @param theClass Of the expected referrer Term
      * @return null if theTerm was a free {@link Var}iable
      */
-    public Bindings focus(Object theTerm, Class<? extends Term> theClass) {
+    public Bindings focus(Object theTerm, Class<? extends Object> theClass) {
         if (theTerm instanceof Var) {
             final Var origin = (Var) theTerm;
             if (origin.isAnonymous()) {

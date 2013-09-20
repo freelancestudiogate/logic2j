@@ -18,16 +18,14 @@
 package org.logic2j.core.api.model.symbol;
 
 import java.util.Collection;
-import java.util.IdentityHashMap;
-
-import org.logic2j.core.api.model.var.Binding;
-import org.logic2j.core.api.model.var.Bindings;
 
 /**
  * {@link TNumber}s are numeric {@link Term}s.
  */
 public abstract class TNumber extends Term implements Comparable<TNumber> {
     private static final long serialVersionUID = 1L;
+
+    public abstract Number toNumber();
 
     /**
      * Returns the value of the number as long
@@ -65,13 +63,6 @@ public abstract class TNumber extends Term implements Comparable<TNumber> {
 
     Var findVar(String theVariableName) {
         return null;
-    }
-
-    /**
-     * No substitution occurs on literals.
-     */
-    Term substitute(Bindings theBindings, IdentityHashMap<Binding, Var> theBindingsToVars) {
-        return this;
     }
 
     /**

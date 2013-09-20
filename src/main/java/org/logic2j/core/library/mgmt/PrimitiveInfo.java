@@ -25,9 +25,7 @@ import org.logic2j.core.api.SolutionListener;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.RecursionException;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.var.Bindings;
-import org.logic2j.core.api.solver.listener.SolutionListenerBase;
 
 /**
  * Describe a {@link Primitive}, which is either a:
@@ -130,12 +128,6 @@ public class PrimitiveInfo {
             }
             throw new InvalidTermException("Primitive threw an exception: " + this + ": " + targetException, targetException);
         }
-    }
-
-    private static final SolutionListenerBase NO_LISTENER = null;
-
-    public Term invokeFunctor(Struct theGoalStruct, Bindings theGoalVars) {
-        return (Term) invoke(theGoalStruct, theGoalVars, NO_LISTENER);
     }
 
     // ---------------------------------------------------------------------------
