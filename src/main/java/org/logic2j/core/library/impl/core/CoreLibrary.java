@@ -274,7 +274,7 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive
     public Continuation is(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        final Object evaluated = evaluateFunctor(theBindings, t2);
+        final Object evaluated = evaluate(t2, theBindings);
         if (evaluated == null) {
             return Continuation.CONTINUE;
         }
@@ -286,7 +286,7 @@ public class CoreLibrary extends LibraryBase {
     // Binary numeric predicates
     // ---------------------------------------------------------------------------
 
-    private static interface NumberBinaryClosure {
+    private static interface ComparisonFunction {
         boolean apply(Number val1, Number val2);
     }
 
@@ -300,9 +300,9 @@ public class CoreLibrary extends LibraryBase {
      * @param theEvaluationFunction
      * @return
      */
-    private Continuation binaryNumericPredicate(SolutionListener theListener, Bindings theBindings, Object t1, Object t2, NumberBinaryClosure theEvaluationFunction) {
-        final Object effectiveT1 = evaluateFunctor(theBindings, t1);
-        final Object effectiveT2 = evaluateFunctor(theBindings, t2);
+    private Continuation binaryComparisonPredicate(SolutionListener theListener, Bindings theBindings, Object t1, Object t2, ComparisonFunction theEvaluationFunction) {
+        final Object effectiveT1 = evaluate(t1, theBindings);
+        final Object effectiveT2 = evaluate(t2, theBindings);
         Continuation continuation = Continuation.CONTINUE;
         if (effectiveT1 instanceof Number && effectiveT2 instanceof Number) {
             final boolean condition = theEvaluationFunction.apply((Number) effectiveT1, (Number) effectiveT2);
@@ -324,7 +324,7 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = ">")
     public Continuation expression_greater_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
 
             @Override
             public boolean apply(Number val1, Number val2) {
@@ -335,7 +335,7 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = "<")
     public Continuation expression_lower_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
 
             @Override
             public boolean apply(Number val1, Number val2) {
@@ -346,7 +346,7 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = ">=")
     public Continuation expression_greater_equal_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
 
             @Override
             public boolean apply(Number val1, Number val2) {
@@ -357,7 +357,7 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = "=<")
     public Continuation expression_lower_equal_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
 
             @Override
             public boolean apply(Number val1, Number val2) {
@@ -368,7 +368,7 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = "=:=")
     public Continuation expression_equals(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
 
             @Override
             public boolean apply(Number val1, Number val2) {
@@ -379,7 +379,7 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = "=\\=")
     public Continuation expression_not_equals(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryNumericPredicate(theListener, theBindings, t1, t2, new NumberBinaryClosure() {
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
 
             @Override
             public boolean apply(Number val1, Number val2) {
@@ -392,15 +392,18 @@ public class CoreLibrary extends LibraryBase {
     // Functors
     // ---------------------------------------------------------------------------
 
-    @Primitive(name = "+")
-    public Object plus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        t1 = evaluateFunctor(theBindings, t1);
-        t2 = evaluateFunctor(theBindings, t2);
+    private static interface AggregationFunction {
+        Number apply(Number val1, Number val2);
+    }
+
+    private Object binaryFunctor(SolutionListener theListener, Bindings theBindings, Object t1, Object t2, AggregationFunction theEvaluationFunction) {
+        t1 = evaluate(t1, theBindings);
+        t2 = evaluate(t2, theBindings);
         if (t1 instanceof Number && t2 instanceof Number) {
             if (t1 instanceof Long && t2 instanceof Long) {
-                return ((Long) t1).longValue() + ((Long) t2).longValue();
+                return Long.valueOf(theEvaluationFunction.apply((Number) t1, (Number) t2).longValue());
             } else {
-                return ((Double) t1).longValue() + ((Double) t2).longValue();
+                return Double.valueOf(theEvaluationFunction.apply((Number) t1, (Number) t2).doubleValue());
             }
         }
         if (t1 instanceof TNumber && t2 instanceof TNumber) {
@@ -414,6 +417,21 @@ public class CoreLibrary extends LibraryBase {
         throw new InvalidTermException("Could not add because 2 terms are not Numbers: " + t1 + " and " + t2);
     }
 
+    @Primitive(name = "+")
+    public Object plus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
+        return binaryFunctor(theListener, theBindings, t1, t2, new AggregationFunction() {
+            @Override
+            public Number apply(Number val1, Number val2) {
+                if (val1 instanceof Long && val2 instanceof Long) {
+                    return Long.valueOf(val1.longValue() + val2.longValue());
+                } else {
+                    return Double.valueOf(val1.longValue() + val2.longValue());
+                }
+            }
+
+        });
+    }
+
     /**
      * @param theListener
      * @param theBindings
@@ -423,24 +441,18 @@ public class CoreLibrary extends LibraryBase {
      */
     @Primitive(name = "-")
     public Object minus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        t1 = evaluateFunctor(theBindings, t1);
-        t2 = evaluateFunctor(theBindings, t2);
-        if (t1 instanceof Number && t2 instanceof Number) {
-            if (t1 instanceof Long && t2 instanceof Long) {
-                return Long.valueOf(((Long) t1).longValue() - ((Long) t2).longValue());
-            } else {
-                return Double.valueOf(((Double) t1).longValue() - ((Double) t2).longValue());
+        return binaryFunctor(theListener, theBindings, t1, t2, new AggregationFunction() {
+            @Override
+            public Number apply(Number val1, Number val2) {
+                if (val1 instanceof Long && val2 instanceof Long) {
+                    return Long.valueOf(val1.longValue() - val2.longValue());
+                } else {
+                    return Double.valueOf(val1.longValue() - val2.longValue());
+                }
             }
-        }
-        if (t1 instanceof TNumber && t2 instanceof TNumber) {
-            final TNumber val0n = (TNumber) t1;
-            final TNumber val1n = (TNumber) t2;
-            if (val0n instanceof TLong && val1n instanceof TLong) {
-                return new TLong(val0n.longValue() - val1n.longValue());
-            }
-            return new TDouble(val0n.doubleValue() - val1n.doubleValue());
-        }
-        throw new InvalidTermException("Could not subtract because 2 terms are not Numbers: " + t1 + " and " + t2);
+
+        });
+
     }
 
     /**
@@ -451,24 +463,18 @@ public class CoreLibrary extends LibraryBase {
      */
     @Primitive(name = "*")
     public Object multiply(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        t1 = evaluateFunctor(theBindings, t1);
-        t2 = evaluateFunctor(theBindings, t2);
-        if (t1 instanceof Number && t2 instanceof Number) {
-            if (t1 instanceof Long && t2 instanceof Long) {
-                return Long.valueOf(((Long) t1).longValue() * ((Long) t2).longValue());
-            } else {
-                return Double.valueOf(((Double) t1).longValue() * ((Double) t2).longValue());
+        return binaryFunctor(theListener, theBindings, t1, t2, new AggregationFunction() {
+            @Override
+            public Number apply(Number val1, Number val2) {
+                if (val1 instanceof Long && val2 instanceof Long) {
+                    return Long.valueOf(val1.longValue() * val2.longValue());
+                } else {
+                    return Double.valueOf(val1.longValue() * val2.longValue());
+                }
             }
-        }
-        if (t1 instanceof TNumber && t2 instanceof TNumber) {
-            final TNumber val0n = (TNumber) t1;
-            final TNumber val1n = (TNumber) t2;
-            if (val0n instanceof TLong && val1n instanceof TLong) {
-                return new TLong(val0n.longValue() * val1n.longValue());
-            }
-            return new TDouble(val0n.doubleValue() * val1n.doubleValue());
-        }
-        throw new InvalidTermException("Could not multiply because 2 terms are not Numbers: " + t1 + " and " + t2);
+
+        });
+
     }
 
     /**
@@ -478,17 +484,18 @@ public class CoreLibrary extends LibraryBase {
      * @return Unary minus (negate)
      */
     @Primitive(name = "-")
-    public Term minus(SolutionListener theListener, Bindings theBindings, Object t1) {
-        t1 = evaluateFunctor(theBindings, t1);
-        if (t1 instanceof TNumber) {
-            final TNumber val0n = (TNumber) t1;
-            if (val0n instanceof TDouble) {
-                return new TDouble(val0n.doubleValue() * -1);
-            } else if (val0n instanceof TLong) {
-                return new TLong(val0n.longValue() * -1);
+    public Object minus(SolutionListener theListener, Bindings theBindings, Object t1) {
+        return binaryFunctor(theListener, theBindings, t1, 0L, new AggregationFunction() {
+            @Override
+            public Number apply(Number val1, Number val2) {
+                if (val1 instanceof Long && val2 instanceof Long) {
+                    return Long.valueOf(-val1.longValue());
+                } else {
+                    return Double.valueOf(-val1.longValue());
+                }
             }
-        }
-        throw new InvalidTermException("Could not negate because argument " + t1 + " is not TNumber but " + t1.getClass());
-    }
 
+        });
+
+    }
 }

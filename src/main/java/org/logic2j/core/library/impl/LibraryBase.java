@@ -114,7 +114,7 @@ public class LibraryBase implements PLibrary {
     /**
      * Evaluates an expression. Returns null value if the argument is not an evaluable expression
      */
-    protected Object evaluateFunctor(Bindings theBindings, Object theTerm) {
+    protected Object evaluate(Object theTerm, Bindings theBindings) {
         if (theTerm == null) {
             return null;
         }
