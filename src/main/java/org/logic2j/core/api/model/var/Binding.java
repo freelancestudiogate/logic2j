@@ -17,7 +17,6 @@
  */
 package org.logic2j.core.api.model.var;
 
-import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.Term;
@@ -43,7 +42,7 @@ import org.logic2j.core.api.model.symbol.Var;
  *     bindings to the application code.
  * </pre>
  */
-public class Binding implements Cloneable {
+public class Binding {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Binding.class);
     private static final boolean debug = logger.isDebugEnabled();
 
@@ -67,6 +66,19 @@ public class Binding implements Cloneable {
     }
 
     /**
+     * Copy constructor.
+     * 
+     * @param toClone
+     */
+    public Binding(Binding toClone) {
+        this.link = toClone.link;
+        this.literalBindings = toClone.literalBindings;
+        this.term = toClone.term;
+        this.type = toClone.type;
+        this.var = toClone.var;
+    }
+
+    /**
      * Factory method to create one "fake" binding to a literal.
      * 
      * @param theLiteral
@@ -82,19 +94,6 @@ public class Binding implements Cloneable {
         binding.literalBindings = theLiteralBindings;
         binding.setVar(null);
         return binding;
-    }
-
-    /**
-     * @return A clone of this {@link Binding} without throwing a checked exception.
-     *         TODO Seems slow (according to JVisualVM) - maybe a copy constructor instead?
-     */
-    public Binding cloneIt() {
-        try {
-            final Binding clone = (Binding) this.clone();
-            return clone;
-        } catch (final CloneNotSupportedException e) {
-            throw new InvalidTermException("Failed cloning " + this + " : " + e);
-        }
     }
 
     /**

@@ -294,7 +294,7 @@ public class TermApi {
      */
     public static Object cloneTerm(Object theTerm) {
         if (theTerm instanceof Struct) {
-            return ((Struct) theTerm).cloneIt();
+            return new Struct((Struct) theTerm);
         } else {
             return theTerm; // not cloned
         }

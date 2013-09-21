@@ -68,7 +68,7 @@ public class Clause {
      * @param theOriginal
      */
     public Clause(Clause theOriginal) {
-        this.content = theOriginal.content.cloneIt(); // TODO LT: Why do we need cloning the content in a structure-sharing design???
+        this.content = new Struct(theOriginal.content); // TODO LT: Why do we need cloning the content in a structure-sharing design???
         // Clone the block of variables
         this.bindings = Bindings.deepCopyWithSameReferrer(theOriginal.getBindings());
     }

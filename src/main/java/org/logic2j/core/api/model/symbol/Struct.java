@@ -120,6 +120,23 @@ public final class Struct extends Term {
     }
 
     /**
+     * Copy constructor.
+     * 
+     * @return
+     */
+    public Struct(Struct toClone) {
+        this.name = toClone.name;
+        this.arity = toClone.arity;
+        this.primitiveInfo = toClone.primitiveInfo;
+        if (this.arity > 0) {
+            this.args = new Object[this.arity];
+            for (int i = 0; i < this.arity; i++) {
+                this.args[i] = TermApi.cloneTerm(toClone.args[i]);
+            }
+        }
+    }
+
+    /**
      * Factory to builds a compound, with non-{@link Term} arguments that will be converted
      * by {@link TermApi#valueOf(Object, ANY_TERM)}.
      * 
@@ -309,26 +326,6 @@ public final class Struct extends Term {
     // Template methods defined in abstract class Term
     // ---------------------------------------------------------------------------
 
-    /**
-     * Gets a copy of this structure
-     */
-    @SuppressWarnings("unchecked")
-    // TODO LT: also unclear here why we get a warning
-    public Struct cloneIt() {
-        Struct t;
-        try {
-            t = (Struct) this.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new InvalidTermException("Could not clone: " + e, e);
-        }
-        t.setNameAndArity(this.name, this.arity);
-        t.args = new Object[this.arity];
-        t.primitiveInfo = this.primitiveInfo;
-        for (int i = 0; i < this.arity; i++) {
-            t.args[i] = TermApi.cloneTerm(this.args[i]);
-        }
-        return t;
-    }
 
     /**
      * Set {@link Term#index} to {@link Term#NO_INDEX}, recursively collect all argument's terms, and finally add this {@link Struct} to
@@ -365,7 +362,7 @@ public final class Struct extends Term {
         // Now initialize result - a new Struct only if any change was found below
         final Struct factorized;
         if (anyChange) {
-            factorized = this.cloneIt();
+            factorized = new Struct(this);
             factorized.args = newArgs;
         } else {
             factorized = this;
