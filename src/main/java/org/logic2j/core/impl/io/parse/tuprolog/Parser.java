@@ -42,7 +42,6 @@ import java.util.regex.Pattern;
 import org.logic2j.core.api.model.OperatorManager;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.impl.io.operator.Operator;

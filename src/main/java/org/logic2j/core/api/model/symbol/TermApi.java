@@ -289,18 +289,6 @@ public class TermApi {
     }
 
     /**
-     * @param theTerm
-     * @return
-     */
-    public static Object cloneTerm(Object theTerm) {
-        if (theTerm instanceof Struct) {
-            return new Struct((Struct) theTerm);
-        } else {
-            return theTerm; // not cloned
-        }
-    }
-
-    /**
      * Primitive factory for simple {@link Term}s from plain Java {@link Object}s, use this
      * with parcimony at low-level.
      * Higher-level must use {@link TermAdapter} or {@link TermExchanger} instead which can be

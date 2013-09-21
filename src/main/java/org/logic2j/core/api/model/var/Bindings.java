@@ -208,7 +208,6 @@ public class Bindings {
         // All bindings need cloning
         for (int i = 0; i < nbVars; i++) {
             copiedArray[i] = new Binding(theOriginal.bindings[i]);
-            // copiedArray[i] = theOriginal.bindings[i].cloneIt(); // Cloning was VERY slow
         }
         return new Bindings(theNewReferrer, copiedArray);
     }

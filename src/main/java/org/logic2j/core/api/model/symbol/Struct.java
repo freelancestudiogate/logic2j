@@ -131,7 +131,11 @@ public final class Struct extends Term {
         if (this.arity > 0) {
             this.args = new Object[this.arity];
             for (int i = 0; i < this.arity; i++) {
-                this.args[i] = TermApi.cloneTerm(toClone.args[i]);
+                Object cloned = toClone.args[i];
+                if (cloned instanceof Struct) {
+                    cloned = new Struct((Struct) cloned);
+                }
+                this.args[i] = cloned;
             }
         }
     }
@@ -325,7 +329,6 @@ public final class Struct extends Term {
     // ---------------------------------------------------------------------------
     // Template methods defined in abstract class Term
     // ---------------------------------------------------------------------------
-
 
     /**
      * Set {@link Term#index} to {@link Term#NO_INDEX}, recursively collect all argument's terms, and finally add this {@link Struct} to

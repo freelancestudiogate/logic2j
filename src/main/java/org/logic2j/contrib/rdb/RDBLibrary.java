@@ -98,7 +98,10 @@ public class RDBLibrary extends LibraryBase {
 
         // The goal we are solving
         Object internalGoal = Struct.valueOf("gd3_solve", conditions, resultVar);
-        internalGoal = TermApi.cloneTerm(internalGoal);
+        if (internalGoal instanceof Struct) {
+            // Clone
+            internalGoal = new Struct((Struct) internalGoal);
+        }
         // Watch out this destroys the indexes in the original expression !!!!
         internalGoal = TermApi.normalize(internalGoal, getProlog().getLibraryManager().wholeContent());
         final Bindings internalBindings = new Bindings(internalGoal);

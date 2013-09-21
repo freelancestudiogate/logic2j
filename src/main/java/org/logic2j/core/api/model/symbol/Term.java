@@ -40,7 +40,7 @@ import org.logic2j.core.impl.DefaultTermExchanger;
  * @see Var
  * @see TNumber
  */
-public abstract class Term implements Serializable, Cloneable {
+public abstract class Term implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
