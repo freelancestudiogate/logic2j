@@ -157,7 +157,8 @@ public class Bindings {
         } else if (theReferrer instanceof TNumber) {
             index = ((TNumber) theReferrer).getIndex();
         } else {
-            throw new PrologNonSpecificError("Should not happen here");
+            // It's a plain Java object
+            index = 0;
         }
         if (index == Term.NO_INDEX) {
             throw new InvalidTermException("Index of Term '" + theReferrer + "' is not yet initialized, cannot create Bindings because Term is not ready for inference. Normalize it first.");

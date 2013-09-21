@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.logic2j.core.PrologTestBase;
 import org.logic2j.core.api.Unifier;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TLong;
 import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
@@ -142,7 +141,7 @@ public class UnifierTest extends PrologTestBase {
     public void unifyVarToBoundTerm() { // Once a nasty bug
         final Object varA = TermApi.normalize(new Var("A"), null);
         final Bindings bindingsA = new Bindings(varA);
-        final Object tlong = TermApi.normalize(new TLong(123), null);
+        final Object tlong = TermApi.normalize(123L, null);
         final boolean aToLiteral = this.unifier.unify(varA, bindingsA, tlong, new Bindings(tlong));
         logger.info("A={}", varA);
         logger.info("A={}", TermApi.substitute(varA, bindingsA, null));
