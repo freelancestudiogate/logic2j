@@ -59,12 +59,6 @@ public class TermApi {
         if (theTerm instanceof Var) {
             return theVisitor.visit((Var) theTerm);
         }
-        if (theTerm instanceof TLong) {
-            return theVisitor.visit((TLong) theTerm);
-        }
-        if (theTerm instanceof TDouble) {
-            return theVisitor.visit((TDouble) theTerm);
-        }
         // throw new PrologNonSpecificError("Should not happen here");
         // Extension
         if (theTerm instanceof String) {
@@ -103,8 +97,6 @@ public class TermApi {
             ((Struct) theTerm).collectTermsInto(collection);
         } else if (theTerm instanceof Var) {
             ((Var) theTerm).collectTermsInto(collection);
-        } else if (theTerm instanceof TNumber) {
-            ((TNumber) theTerm).collectTermsInto(collection);
         } else {
             // Not a Term but a plain Java object - won't collect
             collection.add(theTerm);
@@ -152,8 +144,6 @@ public class TermApi {
             return ((Struct) theTerm).factorize(collection);
         } else if (theTerm instanceof Var) {
             return ((Var) theTerm).factorize(collection);
-        } else if (theTerm instanceof TNumber) {
-            return ((TNumber) theTerm).factorize(collection);
         } else {
             // Not a Term but a plain Java object - won't factorize
             return theTerm;
@@ -172,8 +162,6 @@ public class TermApi {
             return ((Struct) theTerm).structurallyEquals(theOther);
         } else if (theTerm instanceof Var) {
             return ((Var) theTerm).structurallyEquals(theOther);
-        } else if (theTerm instanceof TNumber) {
-            return ((TNumber) theTerm).structurallyEquals(theOther);
         } else {
             // Not a Term but a plain Java object - calculate equality
             return theTerm.equals(theOther);
@@ -191,8 +179,6 @@ public class TermApi {
             return ((Struct) theTerm).findVar(theVariableName);
         } else if (theTerm instanceof Var) {
             return ((Var) theTerm).findVar(theVariableName);
-        } else if (theTerm instanceof TNumber) {
-            return ((TNumber) theTerm).findVar(theVariableName);
         } else {
             // Not a Term but a plain Java object - no var
             return null;
@@ -221,8 +207,6 @@ public class TermApi {
             return ((Struct) theTerm).assignIndexes(theIndexOfNextNonIndexedVar);
         } else if (theTerm instanceof Var) {
             return ((Var) theTerm).assignIndexes(theIndexOfNextNonIndexedVar);
-        } else if (theTerm instanceof TNumber) {
-            return ((TNumber) theTerm).assignIndexes(theIndexOfNextNonIndexedVar);
         } else {
             // Not a Term but a plain Java object - can't assign an index
             return theIndexOfNextNonIndexedVar;
@@ -258,8 +242,6 @@ public class TermApi {
             return ((Struct) theTerm).substitute(theBindings, theBindingsToVars);
         } else if (theTerm instanceof Var) {
             return ((Var) theTerm).substitute(theBindings, theBindingsToVars);
-        } else if (theTerm instanceof TNumber) {
-            return theTerm;
         } else {
             // Not a Term but a plain Java object - can't assign an index
             return theTerm;

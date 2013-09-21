@@ -25,7 +25,6 @@ import java.util.TreeMap;
 import org.logic2j.core.api.Unifier;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Binding;
@@ -112,33 +111,12 @@ public class DelegatingUnifier implements Unifier {
         return true;
     }
 
-    public boolean unify(Struct term1, TNumber term2, Bindings theBindings1, Bindings theBindings2) {
-        return false;
-    }
-
     public boolean unify(Struct term1, Var term2, Bindings theBindings1, Bindings theBindings2) {
         // Second term is var, we prefer have it first
         return unify(term2, term1, theBindings2, theBindings1);
     }
 
-    public boolean unify(TNumber term1, Struct term2, Bindings theBindings1, Bindings theBindings2) {
-        return false;
-    }
-
-    public boolean unify(TNumber term1, TNumber term2, Bindings theBindings1, Bindings theBindings2) {
-        return term1.equals(term2);
-    }
-
-    public boolean unify(TNumber term1, Var term2, Bindings theBindings1, Bindings theBindings2) {
-        // Second term is var, we prefer have it first
-        return unify(term2, term1, theBindings2, theBindings1);
-    }
-
     public boolean unify(Var term1, Struct term2, Bindings theBindings1, Bindings theBindings2) {
-        return unifyVarToWhatever(term1, term2, theBindings1, theBindings2);
-    }
-
-    public boolean unify(Var term1, TNumber term2, Bindings theBindings1, Bindings theBindings2) {
         return unifyVarToWhatever(term1, term2, theBindings1, theBindings2);
     }
 

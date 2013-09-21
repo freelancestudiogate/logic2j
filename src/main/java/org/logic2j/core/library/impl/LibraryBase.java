@@ -23,7 +23,6 @@ import org.logic2j.core.api.TermAdapter.FactoryMode;
 import org.logic2j.core.api.model.Continuation;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Binding;
 import org.logic2j.core.api.model.var.Bindings;
@@ -127,9 +126,6 @@ public class LibraryBase implements PLibrary {
             theTerm = binding.getTerm();
         }
 
-        if (theTerm instanceof TNumber) {
-            return theTerm;
-        }
         // Temporarily for plain Java numbers - but we should anyway return other objects too
         if (theTerm instanceof Number) {
             return theTerm;

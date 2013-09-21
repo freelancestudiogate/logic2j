@@ -26,9 +26,6 @@ import org.logic2j.core.api.model.Continuation;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TDouble;
-import org.logic2j.core.api.model.symbol.TLong;
-import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
@@ -88,7 +85,7 @@ public class CoreLibrary extends LibraryBase {
         final Bindings b = theBindings.focus(theTerm, Term.class);
         assertValidBindings(b, "atomic/1");
         final Object effectiveTerm = b.getReferrer();
-        if (effectiveTerm instanceof Struct || effectiveTerm instanceof TNumber) {
+        if (effectiveTerm instanceof Struct || effectiveTerm instanceof Number) {
             return notifySolution(theListener);
         }
         return Continuation.CONTINUE;
@@ -99,7 +96,7 @@ public class CoreLibrary extends LibraryBase {
         final Bindings b = theBindings.focus(theTerm, Term.class);
         assertValidBindings(b, "number/1");
         final Object effectiveTerm = b.getReferrer();
-        if (effectiveTerm instanceof TNumber) {
+        if (effectiveTerm instanceof Number) {
             return notifySolution(theListener);
         }
         return Continuation.CONTINUE;
@@ -311,14 +308,6 @@ public class CoreLibrary extends LibraryBase {
             }
             return continuation;
         }
-        if (effectiveT1 instanceof TNumber && effectiveT2 instanceof TNumber) {
-            final Number value1 = ((TNumber) effectiveT1).toNumber();
-            final Number value2 = ((TNumber) effectiveT2).toNumber();
-            final boolean condition = theEvaluationFunction.apply(value1, value2);
-            if (condition) {
-                continuation = notifySolution(theListener);
-            }
-        }
         return continuation;
     }
 
@@ -405,14 +394,6 @@ public class CoreLibrary extends LibraryBase {
             } else {
                 return Double.valueOf(theEvaluationFunction.apply((Number) t1, (Number) t2).doubleValue());
             }
-        }
-        if (t1 instanceof TNumber && t2 instanceof TNumber) {
-            final TNumber val0n = (TNumber) t1;
-            final TNumber val1n = (TNumber) t2;
-            if (val0n instanceof TLong && val1n instanceof TLong) {
-                return new TLong(val0n.longValue() + val1n.longValue());
-            }
-            return new TDouble(val0n.doubleValue() + val1n.doubleValue());
         }
         throw new InvalidTermException("Could not add because 2 terms are not Numbers: " + t1 + " and " + t2);
     }

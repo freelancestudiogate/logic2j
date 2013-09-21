@@ -19,7 +19,6 @@ package org.logic2j.core.impl.unify;
 
 import org.logic2j.core.api.Unifier;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Binding;
 import org.logic2j.core.api.model.var.Bindings;
@@ -102,7 +101,7 @@ public class DefaultUnifier implements Unifier {
                 throw new IllegalStateException("Internal error, unexpected binding type for " + binding1);
             }
         }
-        // term1 can only be a Struct or TNumber
+        // term1 can only be a Struct or an Object
         if (term1 instanceof Struct) {
             if (term2 instanceof Struct) {
                 final Struct s1 = (Struct) term1;
@@ -117,11 +116,6 @@ public class DefaultUnifier implements Unifier {
                     }
                 }
                 return true;
-            }
-            return false;
-        } else if (term1 instanceof TNumber) {
-            if (term2 instanceof TNumber) {
-                return term1.equals(term2);
             }
             return false;
         } else {

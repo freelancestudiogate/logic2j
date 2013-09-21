@@ -21,7 +21,6 @@ package org.logic2j.core.api;
 import java.util.List;
 
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.Var;
 
@@ -38,7 +37,7 @@ public interface TermAdapter {
         ATOM,
 
         /**
-         * Result will be either an atom (a {@link Struct} of 0-arity), a numeric ({@link TNumber}), but not a {@link Var}iable neither a
+         * Result will be either an atom (a {@link Struct} of 0-arity), an object, but not a {@link Var}iable neither a
          * compound {@link Struct}.
          */
         LITERAL,

@@ -28,7 +28,6 @@ import org.logic2j.core.api.model.TermVisitorBase;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
@@ -154,8 +153,6 @@ public class Bindings {
             index = ((Var) theReferrer).getIndex();
         } else if (theReferrer instanceof Struct) {
             index = ((Struct) theReferrer).getIndex();
-        } else if (theReferrer instanceof TNumber) {
-            index = ((TNumber) theReferrer).getIndex();
         } else {
             // It's a plain Java object
             index = 0;

@@ -22,8 +22,6 @@ import org.logic2j.core.api.TermExchanger;
 import org.logic2j.core.api.model.OperatorManager;
 import org.logic2j.core.api.model.PartialTermVisitor;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TDouble;
-import org.logic2j.core.api.model.symbol.TLong;
 import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
@@ -42,16 +40,6 @@ public class DefaultTermExchanger implements TermExchanger {
     private static final String ELEM_SEPARATOR = ",".intern();
 
     private class FormattingVisitor implements PartialTermVisitor<String> {
-
-        @Override
-        public String visit(TLong theLong) {
-            return String.valueOf(theLong.longValue());
-        }
-
-        @Override
-        public String visit(TDouble theDouble) {
-            return String.valueOf(theDouble.doubleValue());
-        }
 
         @Override
         public String visit(Struct theStruct) {

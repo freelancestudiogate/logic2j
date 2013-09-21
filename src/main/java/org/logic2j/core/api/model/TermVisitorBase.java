@@ -18,8 +18,6 @@
 package org.logic2j.core.api.model;
 
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TDouble;
-import org.logic2j.core.api.model.symbol.TLong;
 import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
 
@@ -29,16 +27,6 @@ import org.logic2j.core.api.model.symbol.Var;
  * Intended to be derived when implementing useful {@link TermVisitor}s. Appropriate for searching through structures, or traversing all.
  */
 public class TermVisitorBase<T> implements PartialTermVisitor<T> {
-
-    @Override
-    public T visit(TLong theLong) {
-        return null;
-    }
-
-    @Override
-    public T visit(TDouble theDouble) {
-        return null;
-    }
 
     @Override
     public T visit(Var theVar) {

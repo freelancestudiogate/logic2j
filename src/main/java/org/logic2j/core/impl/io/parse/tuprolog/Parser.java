@@ -361,11 +361,11 @@ public class Parser {
         final Token t1 = this.tokenizer.readToken();
 
         if (t1.isType(INTEGER)) {
-            return parseInteger(t1.text); // todo moved method to TNumber
+            return parseInteger(t1.text);
         }
 
         if (t1.isType(FLOAT)) {
-            return parseFloat(t1.text); // todo moved method to TNumber
+            return parseFloat(t1.text);
         }
 
         if (t1.isType(VARIABLE)) {

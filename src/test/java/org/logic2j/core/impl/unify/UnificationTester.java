@@ -204,7 +204,7 @@ class UnificationTester {
     }
 
     /**
-     * @param theExpectedNbBindings TNumber of effective bindings created by unification, and remembered in the trailing bindings to be
+     * @param theExpectedNbBindings number of effective bindings created by unification, and remembered in the trailing bindings to be
      *            deunified.
      */
     public void setExpectedNbBindings(int theExpectedNbBindings) {

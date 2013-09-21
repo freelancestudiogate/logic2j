@@ -94,8 +94,6 @@ public class TermApiTest {
     @Test
     public void assignIndexes() {
         int nbVars;
-        nbVars = TermApi.assignIndexes(new TLong(2));
-        assertEquals(0, nbVars);
         nbVars = TermApi.assignIndexes(new Struct("f"));
         assertEquals(0, nbVars);
         nbVars = TermApi.assignIndexes(new Var("X"));

@@ -42,7 +42,6 @@ import org.logic2j.core.api.model.Continuation;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
-import org.logic2j.core.api.model.symbol.TNumber;
 import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.symbol.Var;
@@ -333,9 +332,9 @@ public class RDBLibrary extends LibraryBase {
      * @param theTerm
      * @return A JDBC argument from a Term value
      */
-    private Object jdbcFromTerm(Term theTerm) {
-        if (theTerm instanceof TNumber) {
-            return ((TNumber) theTerm).longValue();
+    private Object jdbcFromTerm(Object theTerm) {
+        if (theTerm instanceof Number) {
+            return ((Number) theTerm).longValue();
         } else if (theTerm instanceof Struct) {
             final Struct struct = (Struct) theTerm;
             if (TermApi.isList(struct)) {
