@@ -361,11 +361,11 @@ public class Parser {
         final Token t1 = this.tokenizer.readToken();
 
         if (t1.isType(INTEGER)) {
-            return parseInteger(t1.text);
+            return Long.valueOf(t1.text);
         }
 
         if (t1.isType(FLOAT)) {
-            return parseFloat(t1.text);
+            return Double.valueOf(t1.text);
         }
 
         if (t1.isType(VARIABLE)) {
@@ -469,23 +469,11 @@ public class Parser {
 
     // commodity methods to parse numbers
 
-    Long parseInteger(String s) {
-        // final long num = Long.parseLong(s);
-        // return new TLong(num);
-        return Long.valueOf(s);
-    }
-
-    Double parseFloat(String s) {
-        // final double num = Double.parseDouble(s);
-        // return new TDouble(num);
-        return Double.valueOf(s);
-    }
-
     Object createNumber(String s) {
         try {
-            return parseInteger(s);
+            return Long.valueOf(s);
         } catch (final Exception e) {
-            return parseFloat(s);
+            return Double.valueOf(s);
         }
     }
 

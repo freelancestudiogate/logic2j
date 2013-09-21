@@ -104,7 +104,7 @@ public class BenchmarkTest extends PrologTestBase {
         while (true) {
             System.out.print("Press any key to run, q to quit");
             String readLine = br.readLine();
-            if (readLine.startsWith("q")) {
+            if (readLine != null && readLine.startsWith("q")) {
                 break;
             }
             assertNSolutions(724, "queens(10, _)"); // tuProlog needs 28s on my machine

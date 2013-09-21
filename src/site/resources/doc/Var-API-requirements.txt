@@ -32,9 +32,6 @@ UC 2: Obtain values from within a java primtive
 
   protected Term evaluateFunctor(Bindings theBindings, Term theTerm) {
     Term b = theBindings.binding(theTerm).resolved();
-    if (b instanceof TNumber) {
-      return b;
-    }
     if (b instanceof Struct) {
       Struct s = (Struct)b;
       final PrimitiveInfo desc = struct.getPrimitiveInfo();
