@@ -373,18 +373,14 @@ public class Parser {
         }
 
         if (t1.isType(ATOM) || t1.isType(SQ_SEQUENCE) || t1.isType(DQ_SEQUENCE)) {
+            final String functor = t1.text;
             if (!t1.isFunctor()) {
-                return new Struct(t1.text);
+                return new Struct(functor);
             }
 
-            final String functor = t1.text;
             final Token t2 = this.tokenizer.readToken(); // reading left par
             if (!t2.isType(LPAR)) {
                 throw new InvalidTermException("bug in parsing process. Something identified as functor misses its first left parenthesis");// todo
-                                                                                                                                            // check
-                                                                                                                                            // can
-                                                                                                                                            // be
-                                                                                                                                            // skipped
             }
             final LinkedList<Object> a = exprA0_arglist(); // reading arguments
             final Token t3 = this.tokenizer.readToken();
