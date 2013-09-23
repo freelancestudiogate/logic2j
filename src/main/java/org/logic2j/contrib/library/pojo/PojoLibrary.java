@@ -22,7 +22,6 @@ import java.util.TreeMap;
 
 import org.logic2j.core.api.SolutionListener;
 import org.logic2j.core.api.model.Continuation;
-import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.var.Bindings;
 import org.logic2j.core.impl.PrologImplementation;
 import org.logic2j.core.library.impl.LibraryBase;
@@ -44,11 +43,10 @@ public class PojoLibrary extends LibraryBase {
 
     @Primitive
     public Continuation bind(final SolutionListener theListener, Bindings theBindings, Object theBindingName, Object theTarget) {
-        final Bindings nameBindings = theBindings.focus(theBindingName, Struct.class);
+        final Bindings nameBindings = theBindings.focus(theBindingName, Object.class);
         assertValidBindings(nameBindings, "bind/2");
-        final Struct nameTerm = (Struct) nameBindings.getReferrer();
-
-        final String name = nameTerm.getName();
+        final Object nameTerm = nameBindings.getReferrer();
+        final String name = nameTerm.toString();
         final Object instance = extract(name);
         final Object instanceTerm = createConstantTerm(instance);
         final boolean unified = unify(instanceTerm, nameBindings, theTarget, theBindings);

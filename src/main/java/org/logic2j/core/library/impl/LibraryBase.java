@@ -92,6 +92,8 @@ public class LibraryBase implements PLibrary {
     }
 
     /**
+     * TODO Document me!
+     * 
      * @param theBindings
      * @param thePrimitive
      */

@@ -373,9 +373,13 @@ public class Parser {
         }
 
         if (t1.isType(ATOM) || t1.isType(SQ_SEQUENCE) || t1.isType(DQ_SEQUENCE)) {
-            final String functor = t1.text;
+            final String functor = t1.text.intern();
             if (!t1.isFunctor()) {
-                return new Struct(functor);
+                if (functor == Struct.FUNCTOR_CUT || functor == Struct.FUNCTOR_TRUE || functor == Struct.FUNCTOR_FALSE) {
+                    return new Struct(functor);
+                } else {
+                    return functor.intern();
+                }
             }
 
             final Token t2 = this.tokenizer.readToken(); // reading left par

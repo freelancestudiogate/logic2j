@@ -17,7 +17,6 @@
  */
 package org.logic2j.core.api.model;
 
-import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.TermApi;
@@ -40,7 +39,7 @@ public class Clause {
      * The {@link Struct} that represents the content of either a rule (when it has a body) or a fact (does not have a body - or has "true"
      * as body), see description of {@link #isFact()}.
      */
-    private final Struct content; // Immutable, not null
+    private final Object content; // Immutable, not null
 
     /**
      * An empty {@link Bindings} reserved for unifying this clause with goals.
@@ -54,11 +53,11 @@ public class Clause {
      * @param theClauseTerm
      */
     public Clause(PrologImplementation theProlog, Object theClauseTerm) {
-        if (!(theClauseTerm instanceof Struct)) {
-            throw new InvalidTermException("Need a Struct to build a clause, not " + theClauseTerm);
-        }
+        // if (!(theClauseTerm instanceof Struct)) {
+        // throw new InvalidTermException("Need a Struct to build a clause, not " + theClauseTerm);
+        // }
         // Any Clause must be normalized otherwise we won't be able to infer on it!
-        this.content = (Struct) TermApi.normalize(theClauseTerm, theProlog.getLibraryManager().wholeContent());
+        this.content = TermApi.normalize(theClauseTerm, theProlog.getLibraryManager().wholeContent());
         this.bindings = new Bindings(this.content);
     }
 
@@ -68,7 +67,12 @@ public class Clause {
      * @param theOriginal
      */
     public Clause(Clause theOriginal) {
-        this.content = new Struct(theOriginal.content); // TODO LT: Why do we need cloning the content in a structure-sharing design???
+        if (theOriginal.content instanceof Struct) {
+            this.content = new Struct((Struct) theOriginal.content); // TODO LT: Why do we need cloning the content in a structure-sharing
+                                                                     // design???
+        } else {
+            this.content = theOriginal;
+        }
         // Clone the block of variables
         this.bindings = Bindings.deepCopyWithSameReferrer(theOriginal.getBindings());
     }
@@ -80,12 +84,16 @@ public class Clause {
      * @return True if the clause is a fact: if the {@link Struct} does not have ":-" as functor, or if the body is "true".
      */
     public boolean isFact() {
+        if (!(this.content instanceof Struct)) {
+            return true;
+        }
+        final Struct s = (Struct) this.content;
         // TODO (issue) Cache this value, see https://github.com/ltettoni/logic2j/issues/16
-        if (Struct.FUNCTOR_CLAUSE != this.content.getName()) { // Names are {@link String#intern()}alized so OK to check by reference
+        if (Struct.FUNCTOR_CLAUSE != s.getName()) { // Names are {@link String#intern()}alized so OK to check by reference
             return true;
         }
         // We know it's a clause functor, arity must be 2, check the body
-        final Object body = this.content.getRHS();
+        final Object body = s.getRHS();
         if (Struct.ATOM_TRUE.equals(body)) {
             return true;
         }
@@ -94,7 +102,11 @@ public class Clause {
     }
 
     private boolean isWithClauseFunctor() {
-        return Struct.FUNCTOR_CLAUSE == this.content.getName(); // Names are {@link String#intern()}alized so OK to check by reference
+        if (this.content instanceof String) {
+            return false;
+        }
+        return Struct.FUNCTOR_CLAUSE == ((Struct) (this.content)).getName(); // Names are {@link String#intern()}alized so OK to check by
+                                                                             // reference
     }
 
     /**
@@ -103,9 +115,9 @@ public class Clause {
      * 
      * @return The clause's head as a {@link Term}, normally a {@link Struct}.
      */
-    public Struct getHead() {
+    public Object getHead() {
         if (isWithClauseFunctor()) {
-            return (Struct) this.content.getLHS();
+            return ((Struct) this.content).getLHS();
         }
         return this.content;
     }
@@ -115,7 +127,7 @@ public class Clause {
      */
     public Object getBody() {
         if (isWithClauseFunctor()) {
-            return this.content.getRHS();
+            return ((Struct) this.content).getRHS();
         }
         return Struct.ATOM_TRUE;
     }
@@ -128,8 +140,7 @@ public class Clause {
      * @return The key that uniquely identifies the family of the {@link Clause}'s head predicate.
      */
     public String getPredicateKey() {
-        final Struct head = getHead();
-        return head.getPredicateSignature();
+        return TermApi.getPredicateSignature(getHead());
     }
 
     /**

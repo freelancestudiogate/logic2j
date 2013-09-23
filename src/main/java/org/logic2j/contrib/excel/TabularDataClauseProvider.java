@@ -26,6 +26,7 @@ import org.logic2j.core.api.TermAdapter;
 import org.logic2j.core.api.model.Clause;
 import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
+import org.logic2j.core.api.model.symbol.TermApi;
 import org.logic2j.core.api.model.var.Bindings;
 import org.logic2j.core.impl.PrologImplementation;
 
@@ -58,7 +59,7 @@ public class TabularDataClauseProvider implements ClauseProvider {
 
     @Override
     public Iterable<Clause> listMatchingClauses(Struct theGoal, Bindings theGoalBindings) {
-        final String predicateSignature = theGoal.getPredicateSignature();
+        final String predicateSignature = TermApi.getPredicateSignature(theGoal);
         switch (mode) {
         case EAV_NAMED:
             if (!predicateSignature.equals(tabularData.getDataSetName() + "/3")) {

@@ -58,7 +58,8 @@ public class ExcelReaderTest extends PrologTestBase {
     @Test
     public void readAndSolve_eavt() throws IOException {
         setExcelClauseProvider("excel/TEST.xls", TermAdapter.AssertionMode.EAVT);
-        assertNSolutions(1, "eavt('58/2008', 'TPM', 'AD', 'TEST')");
+        // assertNSolutions(1, "eavt('58/2008', 'TPM', 'AD', 'TEST')");
+        assertNSolutions(1, "eavt('129/2008', 'Resolution title', 'Laboratory equipment', 'TEST')");
     }
 
     @Test

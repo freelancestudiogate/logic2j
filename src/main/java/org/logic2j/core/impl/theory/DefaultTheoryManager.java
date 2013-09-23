@@ -110,7 +110,7 @@ public class DefaultTheoryManager implements TheoryManager {
             final Clause cl = new Clause(this.prolog, clauseTerm);
 
             // Handling of the "initialize" special clause - we should provide IoC callback for that, not inline code!!!
-            if ("initialize".equals(cl.getHead().getName())) {
+            if ("initialize".equals(cl.getHead().toString())) {
                 specialInitializeGoalBody = cl.getBody();
             }
             content.add(cl);

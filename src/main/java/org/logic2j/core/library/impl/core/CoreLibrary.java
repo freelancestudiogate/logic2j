@@ -24,7 +24,6 @@ import org.logic2j.core.api.SolutionListener;
 import org.logic2j.core.api.model.Clause;
 import org.logic2j.core.api.model.Continuation;
 import org.logic2j.core.api.model.exception.InvalidTermException;
-import org.logic2j.core.api.model.exception.PrologNonSpecificError;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.Term;
 import org.logic2j.core.api.model.symbol.TermApi;
@@ -132,11 +131,11 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive
     public Continuation atom_length(SolutionListener theListener, Bindings theBindings, Object theAtom, Object theLength) {
-        final Bindings atomBindings = theBindings.focus(theAtom, Struct.class);
+        final Bindings atomBindings = theBindings.focus(theAtom, Object.class);
         assertValidBindings(atomBindings, "atom_length/2");
-        final Struct atom = (Struct) atomBindings.getReferrer();
-
-        final Long atomLength = Long.valueOf((long) atom.getName().length());
+        final Object atom = atomBindings.getReferrer();
+        final String atomText = atom.toString();
+        final Long atomLength = Long.valueOf((long) atomText.length());
         final boolean unified = unify(atomLength, atomBindings, theLength, theBindings);
         return notifyIfUnified(unified, theListener);
     }
@@ -144,7 +143,7 @@ public class CoreLibrary extends LibraryBase {
     @Primitive(synonyms = "\\+")
     // Surprisingly enough the operator \+ means "not provable".
     public Continuation not(final SolutionListener theListener, Bindings theBindings, Object theGoal) {
-        final Bindings subGoalBindings = theBindings.focus(theGoal, Struct.class);
+        final Bindings subGoalBindings = theBindings.focus(theGoal, Object.class);
         assertValidBindings(subGoalBindings, "\\+/1");
 
         // final Term target = resolveNonVar(theGoal, theBindings, "not");
@@ -170,7 +169,7 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive
     public Continuation findall(SolutionListener theListener, final Bindings theBindings, final Object theTemplate, final Object theGoal, final Object theResult) {
-        final Bindings subGoalBindings = theBindings.focus(theGoal, Term.class);
+        final Bindings subGoalBindings = theBindings.focus(theGoal, Object.class);
         assertValidBindings(subGoalBindings, "findall/3");
 
         // Define a listener to collect all solutions for the goal specified
@@ -237,16 +236,13 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = "=..")
     public Continuation predicate2PList(final SolutionListener theListener, Bindings theBindings, Object thePredicate, Object theList) {
-        Bindings resolvedBindings = theBindings.focus(thePredicate, Term.class);
+        Bindings resolvedBindings = theBindings.focus(thePredicate, Object.class);
         Continuation continuation = Continuation.CONTINUE;
 
         if (resolvedBindings.isFreeReferrer()) {
             // thePredicate is still free, going ot match from theList
             resolvedBindings = theBindings.focus(theList, Term.class);
             assertValidBindings(resolvedBindings, "=../2");
-            if (resolvedBindings.isFreeReferrer()) {
-                throw new PrologNonSpecificError("Predicate =.. does not accept both arguments as free variable");
-            }
             final Struct lst2 = (Struct) resolvedBindings.getReferrer();
             final Struct flattened = lst2.predicateFromPList();
             final boolean unified = unify(thePredicate, theBindings, flattened, resolvedBindings);

@@ -74,6 +74,10 @@ public class TermApi {
     }
 
     public static boolean isAtom(Object theTerm) {
+        if (theTerm instanceof String) {
+            // Now plain Strings are atoms!
+            return true;
+        }
         if (theTerm instanceof Struct) {
             final Struct s = (Struct) theTerm;
             return s.getArity() == 0 || s.isEmptyList();
@@ -224,8 +228,18 @@ public class TermApi {
     }
 
     /**
-     * This is an internal template method: the public API entry point is {@link TermApi#substitute(Term, Bindings, IdentityHashMap)}; see a
-     * more detailed description there.
+     * A unique identifier that determines the family of the predicate represented by this {@link Struct}.
+     * 
+     * @return The predicate's name + '/' + arity for normal {@link Struct}, or just the toString() of any other Object
+     */
+    public static String getPredicateSignature(Object thePredicate) {
+        if (thePredicate instanceof Struct) {
+            return ((Struct) thePredicate).getPredicateSignature();
+        }
+        return String.valueOf(thePredicate) + "/0";
+    }
+
+    /**
      * 
      * @param theBindings
      * @param theBindingsToVars
@@ -348,7 +362,6 @@ public class TermApi {
      * 
      * @param theTerm To select from
      * @param theTPathExpression The expression to select from theTerm, see the associated TestCase for specification.
-     * 
      * @param theClass The {@link Term} class or one of its subclass that the desired returned object should be.
      */
     // TODO Should this go to TermAdapter instead? - since we return a new Term
@@ -357,8 +370,11 @@ public class TermApi {
         if (theTPathExpression.isEmpty()) {
             return ReflectUtils.safeCastNotNull("selecting term", theTerm, theClass);
         }
-        if (!(theTerm instanceof Struct)) {
-            throw new PrologNonSpecificError("Cannot extract \"" + theTPathExpression + "\" from " + theTerm);
+        if (theTerm instanceof String) {
+            if (!((String) theTerm).equals(theTPathExpression)) {
+                throw new InvalidTermException("Term \"" + theTerm + "\" cannot match expression \"" + theTPathExpression + '"');
+            }
+            return ReflectUtils.safeCastNotNull("selecting term", theTerm, theClass);
         }
 
         final Struct s = (Struct) theTerm;
@@ -403,5 +419,4 @@ public class TermApi {
         }
         return (T) theTerm;
     }
-
 }

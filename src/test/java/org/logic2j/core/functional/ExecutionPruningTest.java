@@ -34,8 +34,9 @@ import org.logic2j.core.impl.PrologReferenceImplementation;
 public class ExecutionPruningTest extends PrologTestBase {
 
     @Test
-    public void justForDebugging() {
-        // Empty use just for debugging one particular case
+    public void placeholder() {
+        loadTheoryFromTestResourcesDir("test-functional.pl");
+        assertNSolutions(4, "cut4");
     }
 
     @Test

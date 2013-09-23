@@ -43,7 +43,8 @@ public class DefaultTermAdapter implements TermAdapter {
         // FIXME TEMPORARY JUST FOR COMPATIBILITY - move this to TermExchanger
         if (theObject instanceof CharSequence) {
             if (theMode == FactoryMode.ATOM) {
-                return new Struct(theObject.toString());
+                // return new Struct(theObject.toString());
+                return Struct.atom(theObject.toString());
             }
             throw new UnsupportedOperationException("TermAdapter cannot parse complex CharSequences, use TermExchanger instead");
         }
@@ -74,7 +75,7 @@ public class DefaultTermAdapter implements TermAdapter {
         Object result = null;
         if (theObject == null) {
             if (theMode == FactoryMode.ATOM) {
-                result = new Struct(""); // The empty string atom, see note on FactoryMode.ATOM
+                result = Struct.atom(""); // The empty string atom, see note on FactoryMode.ATOM
             } else {
                 throw new InvalidTermException("Cannot create Term from a null argument");
             }
@@ -84,7 +85,8 @@ public class DefaultTermAdapter implements TermAdapter {
             final String chars = theObject.toString();
             if (theMode == FactoryMode.ATOM) {
                 // Anything becomes an atom, actually only a Struct since we don't have powerful parsing here
-                result = new Struct(chars);
+                // result = new Struct(chars);
+                result = Struct.atom(chars);
             }
         }
         // Otherwise apply basic algorithm from TermApi

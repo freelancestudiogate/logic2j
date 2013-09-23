@@ -43,6 +43,11 @@ public class TermApiTest {
     private final PrologImplementation prolog = new PrologReferenceImplementation(InitLevel.L0_BARE);
 
     @Test
+    public void placeholder() throws Exception {
+        //
+    }
+
+    @Test
     public void structurallyEquals() {
         // Vars are never structurally equal ...
         assertFalse(new Var("X").structurallyEquals(new Var("Y")));
@@ -182,11 +187,11 @@ public class TermApiTest {
         assertSame(sTerm.getArg(0), TermApi.selectTerm(term, "[1]", Struct.class));
         assertSame(sTerm.getArg(0), TermApi.selectTerm(term, "a/b", Struct.class));
         assertSame(sTerm.getArg(0), TermApi.selectTerm(term, "a[1]/b", Struct.class));
-        assertEquals(new Struct("b2"), TermApi.selectTerm(term, "a[2]", Struct.class));
-        assertEquals(new Struct("b2"), TermApi.selectTerm(term, "a[2]/b2", Struct.class));
-        assertSame(((Struct) sTerm.getArg(0)).getArg(0), TermApi.selectTerm(term, "a/b/c", Struct.class));
-        assertSame(((Struct) sTerm.getArg(0)).getArg(0), TermApi.selectTerm(term, "a/b[1]", Struct.class));
-        assertSame(((Struct) sTerm.getArg(0)).getArg(0), TermApi.selectTerm(term, "a/[1]", Struct.class));
-        assertEquals(new Struct("c2"), TermApi.selectTerm(term, "a/b[2]", Struct.class));
+        assertSame("b2", TermApi.selectTerm(term, "a[2]", String.class));
+        assertSame("b2", TermApi.selectTerm(term, "a[2]/b2", String.class));
+        assertSame("c", TermApi.selectTerm(term, "a/b/c", String.class));
+        assertSame("c", TermApi.selectTerm(term, "a/b[1]", String.class));
+        assertSame("c", TermApi.selectTerm(term, "a/[1]", String.class));
+        assertSame("c2", TermApi.selectTerm(term, "a/b[2]", String.class));
     }
 }

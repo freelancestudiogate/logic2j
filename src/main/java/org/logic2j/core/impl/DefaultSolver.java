@@ -59,13 +59,18 @@ public class DefaultSolver implements Solver {
         if (debug) {
             logger.debug(">> Entering solveRecursive(\"{}\") with {}", goalTerm, theGoalBindings);
         }
-        if (!(goalTerm instanceof Struct)) {
-            throw new InvalidTermException("Goal \"" + goalTerm + "\" is not a Struct and cannot be solved");
-        }
         Continuation result = Continuation.CONTINUE;
 
+        // At the moment we don't properly manage atoms as goals...
+        final Struct goalStruct;
+        if (goalTerm instanceof String) {
+            // Yet we are not capable of handing String below everywhere - so use a Struct still
+            goalStruct = new Struct((String) goalTerm);
+        } else {
+            goalStruct = (Struct) goalTerm;
+        }
+
         // Extract all features of the goal to solve
-        final Struct goalStruct = (Struct) goalTerm;
         final PrimitiveInfo prim = goalStruct.getPrimitiveInfo();
         final String functor = goalStruct.getName();
         final int arity = goalStruct.getArity();
@@ -195,7 +200,7 @@ public class DefaultSolver implements Solver {
                     // final Bindings clauseVars = Bindings.shallowCopyWithSameReferrer(immutableVars);
                     final Bindings clauseVars = Bindings.deepCopyWithSameReferrer(immutableVars);
 
-                    final Term clauseHead = clause.getHead();
+                    final Object clauseHead = clause.getHead();
                     if (debug) {
                         logger.debug(" Unifying goal  : {}   with   {}", goalTerm, theGoalBindings);
                         logger.debug("  to clause head: {}   with   {}", clauseHead, clauseVars);

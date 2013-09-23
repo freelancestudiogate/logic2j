@@ -43,7 +43,8 @@ public class DefaultTermExchanger implements TermExchanger {
 
         @Override
         public String visit(Struct theStruct) {
-            return String.valueOf(formatStruct(theStruct));
+            final String formatStruct = formatStruct(theStruct);
+            return formatStruct;
         }
 
         @Override
@@ -53,6 +54,13 @@ public class DefaultTermExchanger implements TermExchanger {
 
         @Override
         public String visit(String theAtomString) {
+            if (theAtomString != null && theAtomString.length() > 0 && !Character.isLowerCase(theAtomString.charAt(0))) {
+                StringBuilder sb = new StringBuilder(theAtomString.length() + 2);
+                sb.append('\'');
+                sb.append(theAtomString);
+                sb.append('\'');
+                return sb.toString();
+            }
             return theAtomString;
         }
 
@@ -90,23 +98,15 @@ public class DefaultTermExchanger implements TermExchanger {
             final StringBuilder sb = new StringBuilder((Parser.isAtom(name) ? name : ('\'' + name + '\'')));
             if (arity > 0) {
                 sb.append('(');
-                for (int c = 1; c < arity; c++) {
-                    final Object arg = theStruct.getArg(c - 1);
-                    if (!(arg instanceof Var)) {
-                        sb.append(arg.toString());
-                        sb.append(ARG_SEPARATOR);
-                    } else {
-                        sb.append(formatVar((Var) arg));
+                for (int c = 0; c < arity; c++) {
+                    final Object arg = theStruct.getArg(c);
+                    String accept = TermApi.accept(arg, this);
+                    sb.append(accept);
+                    if (c < arity - 1) {
                         sb.append(ARG_SEPARATOR);
                     }
                 }
-                if (!(theStruct.getArg(arity - 1) instanceof Var)) {
-                    sb.append(theStruct.getArg(arity - 1).toString());
-                    sb.append(')');
-                } else {
-                    sb.append(formatVar((Var) theStruct.getArg(arity - 1)));
-                    sb.append(')');
-                }
+                sb.append(')');
             }
             return sb.toString();
         }

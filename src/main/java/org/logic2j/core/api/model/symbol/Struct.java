@@ -148,9 +148,6 @@ public final class Struct extends Term {
      *       are not of the type needed by this class, but need transformation.
      */
     public static Struct valueOf(String theFunctor, Object... argList) throws InvalidTermException {
-        if (argList.length == 0) {
-            return atom(theFunctor);
-        }
         final Struct newInstance = new Struct(theFunctor, argList.length);
         int i = 0;
         for (final Object element : argList) {
@@ -165,9 +162,12 @@ public final class Struct extends Term {
      * @param theFunctor
      * @return Either a new one created or an existing one
      */
-    public static Struct atom(String theFunctor) {
+    public static Object atom(String theFunctor) {
         // Search in the catalog of atoms for exact match
         final String functor = theFunctor.intern();
+        if (!(functor == Struct.FUNCTOR_CUT || functor == Struct.FUNCTOR_TRUE || functor == Struct.FUNCTOR_FALSE)) {
+            return functor;
+        }
         final Struct found = ATOM_CATALOG.get(functor);
         if (found != null) {
             return found;
@@ -542,7 +542,14 @@ public final class Struct extends Term {
             elements.add(runningElement.getLHS());
             runningElement = (Struct) runningElement.getRHS();
         }
-        return new Struct(((Struct) functor).name, (Object[]) elements.toArray(new Object[elements.size()]));
+        final String fnct;
+        if (functor instanceof String) {
+            fnct = (String) functor;
+        } else {
+            fnct = ((Struct) functor).name;
+        }
+
+        return new Struct(fnct, (Object[]) elements.toArray(new Object[elements.size()]));
     }
 
     @SuppressWarnings("unchecked")
