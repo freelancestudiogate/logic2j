@@ -90,6 +90,7 @@ public final class Struct extends Term {
     private String name; // Always "internalized" with String.intern(), you can compare with == !
     private int arity;
     private Object[] args;
+    private String signature;
 
     // TODO Findbugs found that PrimitiveInfo should be serializable too :-(
     private PrimitiveInfo primitiveInfo;
@@ -127,6 +128,7 @@ public final class Struct extends Term {
     public Struct(Struct toClone) {
         this.name = toClone.name;
         this.arity = toClone.arity;
+        this.signature = toClone.signature;
         this.primitiveInfo = toClone.primitiveInfo;
         if (this.arity > 0) {
             this.args = new Object[this.arity];
@@ -221,6 +223,7 @@ public final class Struct extends Term {
         }
         this.name = theFunctor.intern();
         this.arity = theArity;
+        this.signature = this.name + '/' + this.arity;
     }
 
     /**
@@ -247,6 +250,15 @@ public final class Struct extends Term {
     }
 
     /**
+     * A unique identifier that determines the family of the predicate represented by this {@link Struct}.
+     * 
+     * @return The predicate's name + '/' + arity
+     */
+    public String getPredicateSignature() {
+        return this.signature;
+    }
+
+    /**
      * @return Left-hand-side term, this is, {@link #getArg(int)} at index 0. It is assumed that the term MUST have an arity of 2, because
      *         when there's a LHS, there's also a RHS!
      */
@@ -265,15 +277,6 @@ public final class Struct extends Term {
             throw new PrologNonSpecificError("Can't get the left-hand-side argument of " + this + " (not a binary predicate)");
         }
         return this.args[1];
-    }
-
-    /**
-     * A unique identifier that determines the family of the predicate represented by this {@link Struct}.
-     * 
-     * @return The predicate's name + '/' + arity
-     */
-    public String getPredicateSignature() {
-        return this.name + '/' + this.arity;
     }
 
     public String getVarargsPredicateSignature() {
