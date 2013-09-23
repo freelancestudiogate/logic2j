@@ -62,7 +62,7 @@ cut2(3).
 % Cut after 4
 cut4 :- a(_).       % 3 solutions
 cut4 :- b(_), !.    % Plus one
-cut4.
+cut4.               % And one
 
 cut4b:-cut2(_).cut4b:-cut2(_).
 
