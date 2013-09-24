@@ -195,16 +195,17 @@ public class Bindings {
      * @return
      */
     public static Bindings deepCopyWithSameReferrer(Bindings theOriginal) {
-        return deepCopyWithNewReferrer(theOriginal, theOriginal.getReferrer());
+        return deepCopyWithNewReferrer(theOriginal.getReferrer(), theOriginal);
     }
 
-    private static Bindings deepCopyWithNewReferrer(Bindings theOriginal, Object theNewReferrer) {
+    private static Bindings deepCopyWithNewReferrer(Object theNewReferrer, Bindings theOriginal) {
         // Deep cloning of the individual Binding
-        final int nbVars = theOriginal.bindings.length;
+        final Binding[] originalBindings = theOriginal.bindings;
+        final int nbVars = originalBindings.length;
         final Binding[] copiedArray = new Binding[nbVars];
         // All bindings need cloning
         for (int i = 0; i < nbVars; i++) {
-            copiedArray[i] = new Binding(theOriginal.bindings[i]);
+            copiedArray[i] = new Binding(originalBindings[i]);
         }
         return new Bindings(theNewReferrer, copiedArray);
     }
