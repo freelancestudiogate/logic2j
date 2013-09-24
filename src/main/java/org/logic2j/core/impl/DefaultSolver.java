@@ -140,6 +140,15 @@ public class DefaultSolver implements Solver {
                 logger.debug("Invoking call({})", target);
             }
             result = solveGoalRecursive(target, effectiveGoalBindings, theSolutionListener);
+        } else if (Struct.FUNCTOR_CUT == functor) {
+            // This is a "native" implementation of CUT, which works as good as using the primitive in CoreLibrary
+            // Doing it inline might improve performance a little although I did not measure much
+            // Functionally, this code may be removed
+
+            // Cut IS a valid solution in itself. We just ignore what the app tells us to do next.
+            theSolutionListener.onSolution();
+            // Stopping there for this iteration
+            result = Continuation.CUT;
         } else if (prim != null) {
             // ---------------------------------------------------------------------------
             // Primitive implemented in Java
