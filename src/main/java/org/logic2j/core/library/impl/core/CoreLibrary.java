@@ -31,6 +31,7 @@ import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Binding;
 import org.logic2j.core.api.model.var.Bindings;
 import org.logic2j.core.api.solver.listener.SolutionListenerBase;
+import org.logic2j.core.impl.DefaultSolver;
 import org.logic2j.core.impl.PrologImplementation;
 import org.logic2j.core.impl.util.ReflectUtils;
 import org.logic2j.core.library.impl.LibraryBase;
@@ -43,6 +44,92 @@ import org.logic2j.core.library.mgmt.Primitive;
  */
 public class CoreLibrary extends LibraryBase {
     static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CoreLibrary.class);
+
+    private static final ComparisonFunction COMPARE_GT = new ComparisonFunction() {
+        @Override
+        public boolean apply(Number val1, Number val2) {
+            return val1.doubleValue() > val2.doubleValue();
+        }
+    };
+    private static final ComparisonFunction COMPARISON_LT = new ComparisonFunction() {
+
+        @Override
+        public boolean apply(Number val1, Number val2) {
+            return val1.doubleValue() < val2.doubleValue();
+        }
+    };
+    private static final ComparisonFunction COMPARISON_GE = new ComparisonFunction() {
+
+        @Override
+        public boolean apply(Number val1, Number val2) {
+            return val1.doubleValue() >= val2.doubleValue();
+        }
+    };
+    private static final ComparisonFunction COMPARISON_LE = new ComparisonFunction() {
+
+        @Override
+        public boolean apply(Number val1, Number val2) {
+            return val1.doubleValue() <= val2.doubleValue();
+        }
+    };
+    private static final ComparisonFunction COMPARISON_EQ = new ComparisonFunction() {
+
+        @Override
+        public boolean apply(Number val1, Number val2) {
+            return val1.doubleValue() == val2.doubleValue();
+        }
+    };
+    private static final ComparisonFunction COMPARISON_NE = new ComparisonFunction() {
+
+        @Override
+        public boolean apply(Number val1, Number val2) {
+            return val1.doubleValue() != val2.doubleValue();
+        }
+    };
+    private static final AggregationFunction AGGREGATION_PLUS = new AggregationFunction() {
+        @Override
+        public Number apply(Number val1, Number val2) {
+            if (val1 instanceof Long && val2 instanceof Long) {
+                return Long.valueOf(val1.longValue() + val2.longValue());
+            } else {
+                return Double.valueOf(val1.longValue() + val2.longValue());
+            }
+        }
+
+    };
+    private static final AggregationFunction AGGREGATION_MINUS = new AggregationFunction() {
+        @Override
+        public Number apply(Number val1, Number val2) {
+            if (val1 instanceof Long && val2 instanceof Long) {
+                return Long.valueOf(val1.longValue() - val2.longValue());
+            } else {
+                return Double.valueOf(val1.longValue() - val2.longValue());
+            }
+        }
+
+    };
+    private static final AggregationFunction AGGREGRATION_TIMES = new AggregationFunction() {
+        @Override
+        public Number apply(Number val1, Number val2) {
+            if (val1 instanceof Long && val2 instanceof Long) {
+                return Long.valueOf(val1.longValue() * val2.longValue());
+            } else {
+                return Double.valueOf(val1.longValue() * val2.longValue());
+            }
+        }
+
+    };
+    private static final AggregationFunction AGGREGATION_NEGATE = new AggregationFunction() {
+        @Override
+        public Number apply(Number val1, Number val2) {
+            if (val1 instanceof Long && val2 instanceof Long) {
+                return Long.valueOf(-val1.longValue());
+            } else {
+                return Double.valueOf(-val1.longValue());
+            }
+        }
+
+    };
 
     public CoreLibrary(PrologImplementation theProlog) {
         super(theProlog);
@@ -63,7 +150,6 @@ public class CoreLibrary extends LibraryBase {
     @Primitive
     public Continuation var(SolutionListener theListener, Bindings theBindings, Object t1) {
         Continuation continuation = Continuation.CONTINUE;
-
         if (t1 instanceof Var) {
             final Var var = (Var) t1;
             if (var.isAnonymous()) {
@@ -101,6 +187,13 @@ public class CoreLibrary extends LibraryBase {
         return Continuation.CONTINUE;
     }
 
+    /**
+     * Note: this implmentation is valid, yet may be bypassed by a "native" implemetatino in {@link DefaultSolver}.
+     * 
+     * @param theListener
+     * @param theBindings
+     * @return
+     */
     @Primitive(name = Struct.FUNCTOR_CUT)
     public Continuation cut(SolutionListener theListener, Bindings theBindings) {
         // This is a complex behaviour - read on DefaultSolver
@@ -290,7 +383,7 @@ public class CoreLibrary extends LibraryBase {
      * @param theBindings
      * @param t1
      * @param t2
-     * @param theEvaluationFunction
+     * @param AGGREGRATION_TIMES
      * @return
      */
     private Continuation binaryComparisonPredicate(SolutionListener theListener, Bindings theBindings, Object t1, Object t2, ComparisonFunction theEvaluationFunction) {
@@ -309,68 +402,35 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = ">")
     public Continuation expression_greater_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
 
-            @Override
-            public boolean apply(Number val1, Number val2) {
-                return val1.doubleValue() > val2.doubleValue();
-            }
-        });
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, COMPARE_GT);
     }
 
     @Primitive(name = "<")
     public Continuation expression_lower_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
-
-            @Override
-            public boolean apply(Number val1, Number val2) {
-                return val1.doubleValue() < val2.doubleValue();
-            }
-        });
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, COMPARISON_LT);
     }
 
     @Primitive(name = ">=")
     public Continuation expression_greater_equal_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
-
-            @Override
-            public boolean apply(Number val1, Number val2) {
-                return val1.doubleValue() >= val2.doubleValue();
-            }
-        });
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, COMPARISON_GE);
     }
 
     @Primitive(name = "=<")
     public Continuation expression_lower_equal_than(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
-
-            @Override
-            public boolean apply(Number val1, Number val2) {
-                return val1.doubleValue() <= val2.doubleValue();
-            }
-        });
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, COMPARISON_LE);
     }
 
     @Primitive(name = "=:=")
     public Continuation expression_equals(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
 
-            @Override
-            public boolean apply(Number val1, Number val2) {
-                return val1.doubleValue() == val2.doubleValue();
-            }
-        });
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, COMPARISON_EQ);
     }
 
     @Primitive(name = "=\\=")
     public Continuation expression_not_equals(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryComparisonPredicate(theListener, theBindings, t1, t2, new ComparisonFunction() {
 
-            @Override
-            public boolean apply(Number val1, Number val2) {
-                return val1.doubleValue() != val2.doubleValue();
-            }
-        });
+        return binaryComparisonPredicate(theListener, theBindings, t1, t2, COMPARISON_NE);
     }
 
     // ---------------------------------------------------------------------------
@@ -396,17 +456,8 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive(name = "+")
     public Object plus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryFunctor(theListener, theBindings, t1, t2, new AggregationFunction() {
-            @Override
-            public Number apply(Number val1, Number val2) {
-                if (val1 instanceof Long && val2 instanceof Long) {
-                    return Long.valueOf(val1.longValue() + val2.longValue());
-                } else {
-                    return Double.valueOf(val1.longValue() + val2.longValue());
-                }
-            }
 
-        });
+        return binaryFunctor(theListener, theBindings, t1, t2, AGGREGATION_PLUS);
     }
 
     /**
@@ -418,17 +469,7 @@ public class CoreLibrary extends LibraryBase {
      */
     @Primitive(name = "-")
     public Object minus(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryFunctor(theListener, theBindings, t1, t2, new AggregationFunction() {
-            @Override
-            public Number apply(Number val1, Number val2) {
-                if (val1 instanceof Long && val2 instanceof Long) {
-                    return Long.valueOf(val1.longValue() - val2.longValue());
-                } else {
-                    return Double.valueOf(val1.longValue() - val2.longValue());
-                }
-            }
-
-        });
+        return binaryFunctor(theListener, theBindings, t1, t2, AGGREGATION_MINUS);
 
     }
 
@@ -440,17 +481,7 @@ public class CoreLibrary extends LibraryBase {
      */
     @Primitive(name = "*")
     public Object multiply(SolutionListener theListener, Bindings theBindings, Object t1, Object t2) {
-        return binaryFunctor(theListener, theBindings, t1, t2, new AggregationFunction() {
-            @Override
-            public Number apply(Number val1, Number val2) {
-                if (val1 instanceof Long && val2 instanceof Long) {
-                    return Long.valueOf(val1.longValue() * val2.longValue());
-                } else {
-                    return Double.valueOf(val1.longValue() * val2.longValue());
-                }
-            }
-
-        });
+        return binaryFunctor(theListener, theBindings, t1, t2, AGGREGRATION_TIMES);
 
     }
 
@@ -462,17 +493,7 @@ public class CoreLibrary extends LibraryBase {
      */
     @Primitive(name = "-")
     public Object minus(SolutionListener theListener, Bindings theBindings, Object t1) {
-        return binaryFunctor(theListener, theBindings, t1, 0L, new AggregationFunction() {
-            @Override
-            public Number apply(Number val1, Number val2) {
-                if (val1 instanceof Long && val2 instanceof Long) {
-                    return Long.valueOf(-val1.longValue());
-                } else {
-                    return Double.valueOf(-val1.longValue());
-                }
-            }
-
-        });
+        return binaryFunctor(theListener, theBindings, t1, 0L, AGGREGATION_NEGATE);
 
     }
 }
