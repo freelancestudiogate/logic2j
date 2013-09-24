@@ -32,7 +32,7 @@ import org.logic2j.core.impl.DefaultTermExchanger;
  * <li>Structural equality, see {@link #structurallyEquals(Term)}</li>
  * <li>Factorization, see {@link #factorize(Collection)}</li>
  * <li>Initialization of {@link Var} indexes, see {@link #assignIndexes(short)}</li>
- * <li>Normaliization: includes initialization of indexes, factorization, and identification of primitive functors</li>
+ * <li>Normalization: includes initialization of indexes, factorization, and identification of primitive functors</li>
  * </ul>
  * 
  * @note Maybe one day we will need a subclass to represent timestamps.

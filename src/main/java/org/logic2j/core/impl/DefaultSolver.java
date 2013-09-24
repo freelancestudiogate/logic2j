@@ -118,7 +118,6 @@ public class DefaultSolver implements Solver {
             */
             for (int i = 0; i < arity; i++) {
                 // Solve all the left and right-and-sides, sequentially
-                // TODO what do we do with the "Continuation" result of the method?
                 result = solveGoalRecursive(goalStruct.getArg(i), theGoalBindings, theSolutionListener);
                 if (result == Continuation.CUT) {
                     break;
@@ -250,11 +249,8 @@ public class DefaultSolver implements Solver {
                             }
                             // Notify one solution, and handle result if user wants to continue or not.
                             continuation = theSolutionListener.onSolution();
-                            if (continuation == Continuation.CUT) {
-                                result = Continuation.CUT;
-                            } else if (continuation == Continuation.USER_ABORT) {
-                                // TODO should we just "return" from here?
-                                result = Continuation.USER_ABORT;
+                            if (continuation == Continuation.CUT || continuation == Continuation.USER_ABORT) {
+                                result = continuation;
                             }
                         } else {
                             // Not a fact, it's a theorem - it has a body
