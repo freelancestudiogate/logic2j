@@ -173,126 +173,138 @@ public class DefaultSolver implements Solver {
             }
 
         } else {
-            // Simple "user-defined" goal to demonstrate - find matching goals in the theories loaded
-            final Unifier unifier = this.prolog.getUnifier();
-
-            // Now ready to iteratively try clause by clause, by first attempting to unify with its headTerm
-
-            final Iterable<ClauseProvider> providers = this.prolog.getTheoryManager().getClauseProviders();
-            for (final ClauseProvider provider : providers) {
-                final Iterable<Clause> matchingClauses = provider.listMatchingClauses(goalStruct, theGoalBindings);
-                if (matchingClauses == null) {
-                    continue;
-                }
-                // logger.info("matchingClauses: {}", ((List<?>) matchingClauses).size());
-                for (final Clause clause : matchingClauses) {
-                    if (result == Continuation.CUT) {
-                        if (debug) {
-                            logger.debug("Current status is {}: stop finding more clauses", result);
-                        }
-                        break;
-                    }
-                    if (result == Continuation.USER_ABORT) {
-                        if (debug) {
-                            logger.debug("Current status is {}: abort finding more clauses", result);
-                        }
-                        break;
-                    }
-                    if (debug) {
-                        logger.debug("Trying clause {}, current status={}", clause, result);
-                    }
-
-                    // Clone the variables so that we won't mutate our current clause's ones
-                    final Bindings immutableVars = clause.getBindings();
-
-                    // TODO apparently we cannot afford a shallow copy?
-                    // final Bindings clauseVars = Bindings.shallowCopyWithSameReferrer(immutableVars);
-                    final Bindings clauseVars = Bindings.deepCopyWithSameReferrer(immutableVars);
-
-                    final Object clauseHead = clause.getHead();
-                    if (debug) {
-                        logger.debug(" Unifying goal  : {}   with   {}", goalTerm, theGoalBindings);
-                        logger.debug("  to clause head: {}   with   {}", clauseHead, clauseVars);
-                    }
-
-                    // Now unify - this is the only place where free variables may become bound, and
-                    // the trailFrame will remember this.
-                    // Solutions will be notified from within this method.
-                    // As a consequence, deunification can happen immediately afterwards, in this method, not outside in the caller
-                    final boolean headUnified = unifier.unify(goalTerm, theGoalBindings, clauseHead, clauseVars);
-                    if (debug) {
-                        logger.debug(" headUnified=" + headUnified + ", now: goal {}, clause {}", theGoalBindings, clauseVars);
-                    }
-
-                    if (headUnified) {
-                        try {
-                            final Continuation continuation;
-                            if (clause.isFact()) {
-                                if (debug) {
-                                    logger.debug("{} is a fact, callback one solution", clauseHead);
-                                }
-                                // Notify one solution, and handle result if user wants to continue or not.
-                                continuation = theSolutionListener.onSolution();
-                                if (continuation == Continuation.CUT) {
-                                    result = Continuation.CUT;
-                                } else if (continuation == Continuation.USER_ABORT) {
-                                    // TODO should we just "return" from here?
-                                    result = Continuation.USER_ABORT;
-                                }
-                            } else {
-                                // Not a fact, it's a theorem - it has a body
-                                final Object newGoalTerm = clause.getBody();
-                                if (debug) {
-                                    logger.debug("Clause {} is a theorem whose body is {}", clauseHead, newGoalTerm);
-                                }
-                                // Solve the body in our current subFrame
-                                continuation = solveGoalRecursive(newGoalTerm, clauseVars, theSolutionListener);
-                                if (debug) {
-                                    logger.debug("  back to clause {} with continuation={}", clause, continuation);
-                                }
-                                if (continuation == Continuation.USER_ABORT) {
-                                    // TODO should we just "return" from here?
-                                    result = Continuation.USER_ABORT;
-                                }
-
-                                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                // TODO There is something really ugly here but I'm in the middle of a big refactoring and
-                                // did not find anything better yet.
-                                // When we solve a goal such as "a,b,c,!,d", the cut must ascend up to the first ",", so that further
-                                // attempt to use clauses for a() are also cut.
-                                // However, when we solve main :- sub., then if sub has a cut inside, the cut must not ascend back to the
-                                // main.
-                                // we deal with that here.
-                                // Any other solution (much) welcome.
-                                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                if (newGoalTerm instanceof Struct) {
-                                    final String bodyFunctor = ((Struct) newGoalTerm).getName();
-                                    if (bodyFunctor == Struct.FUNCTOR_CUT || bodyFunctor == Struct.FUNCTOR_COMMA) {
-                                        if (continuation == Continuation.CUT) {
-                                            result = Continuation.CUT;
-                                        }
-                                    }
-                                }
-                            }
-
-                        } finally {
-                            // We have now fired our solution(s), we no longer need our bound bindings and can deunify
-                            // Go to next solution: start by clearing our trailing bindings
-                            unifier.deunify();
-                        }
-                    }
-                }
-                if (debug) {
-                    logger.debug("Last Clause of {} iterated", provider);
-                }
-            }
-            if (debug) {
-                logger.debug("Last ClauseProvider iterated");
-            }
-
+            result = solveAgainstClauseProviders(goalTerm, theGoalBindings, theSolutionListener);
         }
         if (debug) {
             logger.debug("<< Exit    solveGoalRecursive(\"{}\") with {}, continuation=" + result, goalTerm, theGoalBindings);
+        }
+        return result;
+    }
+
+    /**
+     * @param goalTerm
+     * @param theGoalBindings
+     * @param theSolutionListener
+     * @param result
+     * @return
+     */
+    private Continuation solveAgainstClauseProviders(final Object goalTerm, final Bindings theGoalBindings, final SolutionListener theSolutionListener) {
+        // Simple "user-defined" goal to demonstrate - find matching goals in the theories loaded
+        final Unifier unifier = this.prolog.getUnifier();
+
+        Continuation result = Continuation.CONTINUE;
+        // Now ready to iteratively try clause by clause, by first attempting to unify with its headTerm
+
+        final Iterable<ClauseProvider> providers = this.prolog.getTheoryManager().getClauseProviders();
+        for (final ClauseProvider provider : providers) {
+            final Iterable<Clause> matchingClauses = provider.listMatchingClauses(goalTerm, theGoalBindings);
+            if (matchingClauses == null) {
+                continue;
+            }
+            // logger.info("matchingClauses: {}", ((List<?>) matchingClauses).size());
+            for (final Clause clause : matchingClauses) {
+                if (result == Continuation.CUT) {
+                    if (debug) {
+                        logger.debug("Current status is {}: stop finding more clauses", result);
+                    }
+                    break;
+                }
+                if (result == Continuation.USER_ABORT) {
+                    if (debug) {
+                        logger.debug("Current status is {}: abort finding more clauses", result);
+                    }
+                    break;
+                }
+                if (debug) {
+                    logger.debug("Trying clause {}, current status={}", clause, result);
+                }
+
+                // Clone the variables so that we won't mutate our current clause's ones
+                final Bindings immutableVars = clause.getBindings();
+
+                // TODO apparently we cannot afford a shallow copy?
+                // final Bindings clauseVars = Bindings.shallowCopyWithSameReferrer(immutableVars);
+                final Bindings clauseVars = Bindings.deepCopyWithSameReferrer(immutableVars);
+
+                final Object clauseHead = clause.getHead();
+                if (debug) {
+                    logger.debug(" Unifying goal  : {}   with   {}", goalTerm, theGoalBindings);
+                    logger.debug("  to clause head: {}   with   {}", clauseHead, clauseVars);
+                }
+
+                // Now unify - this is the only place where free variables may become bound, and
+                // the trailFrame will remember this.
+                // Solutions will be notified from within this method.
+                // As a consequence, deunification can happen immediately afterwards, in this method, not outside in the caller
+                final boolean headUnified = unifier.unify(goalTerm, theGoalBindings, clauseHead, clauseVars);
+                if (debug) {
+                    logger.debug(" headUnified=" + headUnified + ", now: goal {}, clause {}", theGoalBindings, clauseVars);
+                }
+
+                if (headUnified) {
+                    try {
+                        final Continuation continuation;
+                        if (clause.isFact()) {
+                            if (debug) {
+                                logger.debug("{} is a fact, callback one solution", clauseHead);
+                            }
+                            // Notify one solution, and handle result if user wants to continue or not.
+                            continuation = theSolutionListener.onSolution();
+                            if (continuation == Continuation.CUT) {
+                                result = Continuation.CUT;
+                            } else if (continuation == Continuation.USER_ABORT) {
+                                // TODO should we just "return" from here?
+                                result = Continuation.USER_ABORT;
+                            }
+                        } else {
+                            // Not a fact, it's a theorem - it has a body
+                            final Object newGoalTerm = clause.getBody();
+                            if (debug) {
+                                logger.debug("Clause {} is a theorem whose body is {}", clauseHead, newGoalTerm);
+                            }
+                            // Solve the body in our current subFrame
+                            continuation = solveGoalRecursive(newGoalTerm, clauseVars, theSolutionListener);
+                            if (debug) {
+                                logger.debug("  back to clause {} with continuation={}", clause, continuation);
+                            }
+                            if (continuation == Continuation.USER_ABORT) {
+                                // TODO should we just "return" from here?
+                                result = Continuation.USER_ABORT;
+                            }
+
+                            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            // TODO There is something really ugly here but I'm in the middle of a big refactoring and
+                            // did not find anything better yet.
+                            // When we solve a goal such as "a,b,c,!,d", the cut must ascend up to the first ",", so that further
+                            // attempt to use clauses for a() are also cut.
+                            // However, when we solve main :- sub., then if sub has a cut inside, the cut must not ascend back to the
+                            // main.
+                            // we deal with that here.
+                            // Any other solution (much) welcome.
+                            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            if (newGoalTerm instanceof Struct) {
+                                final String bodyFunctor = ((Struct) newGoalTerm).getName();
+                                if (bodyFunctor == Struct.FUNCTOR_CUT || bodyFunctor == Struct.FUNCTOR_COMMA) {
+                                    if (continuation == Continuation.CUT) {
+                                        result = Continuation.CUT;
+                                    }
+                                }
+                            }
+                        }
+
+                    } finally {
+                        // We have now fired our solution(s), we no longer need our bound bindings and can deunify
+                        // Go to next solution: start by clearing our trailing bindings
+                        unifier.deunify();
+                    }
+                }
+            }
+            if (debug) {
+                logger.debug("Last Clause of {} iterated", provider);
+            }
+        }
+        if (debug) {
+            logger.debug("Last ClauseProvider iterated");
         }
         return result;
     }

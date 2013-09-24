@@ -76,22 +76,26 @@ public class RDBClauseProvider extends RDBBase implements ClauseProvider {
     // ---------------------------------------------------------------------------
 
     @Override
-    public Iterable<Clause> listMatchingClauses(Struct theGoal, Bindings theGoalBindings) {
-        final String predicateName = theGoal.getName();
+    public Iterable<Clause> listMatchingClauses(Object theGoal, Bindings theGoalBindings) {
+        if (!(theGoal instanceof Struct)) {
+            throw new InvalidTermException("Need a Struct term instead of " + theGoal);
+        }
+        final Struct goalStruct = (Struct) theGoal;
+        final String predicateName = goalStruct.getName();
         final SqlBuilder3 builder = new SqlBuilder3();
         builder.setInstruction(SqlBuilder3.SELECT);
-        final String tableName = tableName(theGoal);
+        final String tableName = tableName(goalStruct);
         final Table table = builder.table(tableName);
         final String[] columnName = this.readTableInfo(tableName);
 
-        for (int i = 0; i < theGoal.getArity(); i++) {
+        for (int i = 0; i < goalStruct.getArity(); i++) {
             builder.addProjection(builder.column(table, columnName[i]));
         }
 
-        for (int i = 0; i < theGoal.getArity(); i++) {
-            Object t = theGoal.getArg(i);
+        for (int i = 0; i < goalStruct.getArity(); i++) {
+            Object t = goalStruct.getArg(i);
             if (t instanceof Var && theGoalBindings != null) {
-                t = TermApi.substitute(theGoal.getArg(i), theGoalBindings, null);
+                t = TermApi.substitute(goalStruct.getArg(i), theGoalBindings, null);
             }
             final boolean isAtom = TermApi.isAtom(t);
             if (t instanceof Struct && (isAtom || TermApi.isList(t))) {
