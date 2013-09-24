@@ -134,16 +134,16 @@ public class LibraryBase implements PLibrary {
         }
         if (theTerm instanceof Struct) {
             final Struct struct = (Struct) theTerm;
-            final PrimitiveInfo desc = struct.getPrimitiveInfo();
-            if (desc == null) {
+            final PrimitiveInfo primInfo = struct.getPrimitiveInfo();
+            if (primInfo == null) {
                 // throw new IllegalArgumentException("Predicate's functor " + struct.getName() + " is not a primitive");
                 return null;
             }
-            if (desc.getType() != PrimitiveType.FUNCTOR) {
+            if (primInfo.getType() != PrimitiveType.FUNCTOR) {
                 // throw new IllegalArgumentException("Predicate's functor " + struct.getName() + " is a primitive, but not a functor");
                 return null;
             }
-            final Object result = desc.invoke(struct, theBindings, /* no listener */null);
+            final Object result = primInfo.invoke(struct, theBindings, /* no listener */null);
             return result;
         }
         // FIXME shouldn't we return theTerm?
