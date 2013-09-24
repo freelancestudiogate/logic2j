@@ -17,11 +17,15 @@
  */
 package org.logic2j.core.library.mgmt;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.logic2j.core.api.PLibrary;
 import org.logic2j.core.api.SolutionListener;
+import org.logic2j.core.api.model.Continuation;
 import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.exception.RecursionException;
 import org.logic2j.core.api.model.symbol.Struct;
@@ -62,6 +66,8 @@ public class PrimitiveInfo {
     private final Method method; // The method that implements the primitive's logic
     private final boolean isVarargs;
 
+    private MethodHandle mh = null;
+
     public PrimitiveInfo(PrimitiveType theType, PLibrary theLibrary, String theName, Method theMethod, boolean theVarargs) {
         super();
         this.type = theType;
@@ -69,17 +75,85 @@ public class PrimitiveInfo {
         this.name = theName;
         this.method = theMethod;
         this.isVarargs = theVarargs;
+        // For Dynamic invocation - but does not yet work
+        final Class<?> methodResultClass;
+        switch (this.type) {
+        case PREDICATE:
+            methodResultClass = Continuation.class;
+            break;
+        case FUNCTOR:
+            methodResultClass = Object.class;
+            break;
+        default:
+            methodResultClass = Void.class;
+            break;
+        }
+        final MethodType mt = MethodType.methodType(methodResultClass, SolutionListener.class, Bindings.class, Object.class, Object.class);
+        final String methodName = method.getName();
+        try {
+            final MethodHandles.Lookup lookup = MethodHandles.lookup();
+            this.mh = lookup.findVirtual(this.library.getClass(), methodName, mt);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            // mh will remain null and an NPE will occur at invocation
+        }
+    }
+
+    public Object invoke(Struct theGoalStruct, Bindings theGoalVars, SolutionListener theListener) {
+        try {
+            if (debug) {
+                logger.debug("PRIMITIVE > invocation of {}", this);
+            }
+            // if (theGoalStruct.getArity() != 2) {
+            return invokeReflective(theGoalStruct, theGoalVars, theListener);
+            // } else {
+            // return invokeDynamic(theGoalStruct, theGoalVars, theListener);
+            // }
+        } catch (final IllegalArgumentException e) {
+            throw e;
+        } catch (final IllegalAccessException e) {
+            throw new InvalidTermException("Could not access method " + this.method, e);
+        } catch (final InvocationTargetException e) {
+            final Throwable targetException = e.getTargetException();
+            if (targetException instanceof RecursionException) {
+                // If we already have trouble in recursivity, don't add further exceptions - just rethrow.
+                throw (RecursionException) targetException;
+            }
+            if (targetException instanceof StackOverflowError) {
+                final RecursionException recursionException = new RecursionException("Stack overflow while executing primitive " + this);
+                recursionException.stackOverflow = true;
+                throw recursionException;
+            }
+            if (targetException instanceof RuntimeException) {
+                throw (RuntimeException) targetException;
+            }
+            throw new InvalidTermException("Primitive threw an exception: " + this + ": " + targetException, targetException);
+        } catch (Throwable e) {
+            throw new InvalidTermException("Invocation of method " + this.method + " went really bad: " + e, e);
+        }
+    }
+
+    private Object invokeDynamic(Struct theGoalStruct, Bindings theGoalVars, SolutionListener theListener) throws Throwable {
+        // 10.3 sec
+        final Object result = this.mh.invokeWithArguments(this.library, theListener, theGoalVars, theGoalStruct.getArg(0), theGoalStruct.getArg(1));
+
+        // 108s
+        // final Object result = this.mh.invoke(this.library, theListener, theGoalVars, theGoalStruct.getArg(0), theGoalStruct.getArg(1));
+
+        // fails
+        // final Object result = this.mh.invokeExact(this.library, theListener, theGoalVars, theGoalStruct.getArg(0),
+        // theGoalStruct.getArg(1));
+        return result;
     }
 
     /**
      * @param theGoalStruct
      * @param theGoalVars
      * @param theGoalStruct
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
      */
-    public Object invoke(Struct theGoalStruct, Bindings theGoalVars, SolutionListener theListener) {
-        if (debug) {
-            logger.debug("PRIMITIVE > invocation of {}", this);
-        }
+    private Object invokeReflective(Struct theGoalStruct, Bindings theGoalVars, SolutionListener theListener) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         final int arity = theGoalStruct.getArity();
         final int nbargs = this.isVarargs ? 3 : (2 + arity);
         final Object[] args = new Object[nbargs];
@@ -102,32 +176,12 @@ public class PrimitiveInfo {
                 args[i++] = theGoalStruct.getArg(j++);
             }
         }
-        try {
-            final Object result = this.method.invoke(this.library, args);
-            if (debug) {
-                logger.debug("PRIMITIVE < result={}", result);
-            }
-            return result;
-        } catch (final IllegalArgumentException e) {
-            throw e;
-        } catch (final IllegalAccessException e) {
-            throw new InvalidTermException("Could not access method " + this.method, e);
-        } catch (final InvocationTargetException e) {
-            final Throwable targetException = e.getTargetException();
-            if (targetException instanceof RecursionException) {
-                // If we already have trouble in recursivity, don't add further exceptions - just rethrow.
-                throw (RecursionException) targetException;
-            }
-            if (targetException instanceof StackOverflowError) {
-                final RecursionException recursionException = new RecursionException("Stack overflow while executing primitive " + this);
-                recursionException.stackOverflow = true;
-                throw recursionException;
-            }
-            if (targetException instanceof RuntimeException) {
-                throw (RuntimeException) targetException;
-            }
-            throw new InvalidTermException("Primitive threw an exception: " + this + ": " + targetException, targetException);
+        final Object result = this.method.invoke(this.library, args);
+        if (debug) {
+            logger.debug("PRIMITIVE < result={}", result);
         }
+        return result;
+
     }
 
     // ---------------------------------------------------------------------------
