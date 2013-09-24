@@ -19,7 +19,9 @@
 package org.logic2j.contrib.pojo;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
+import java.awt.Rectangle;
 import java.util.Arrays;
 
 import org.junit.Before;
@@ -71,4 +73,20 @@ public class DynamicClauseProviderTest extends PrologTestBase {
         dynamic.retractFactAt(index2);
         assertNoSolution("zz(X)");
     }
+
+    @Test
+    public void assertObjectFact() {
+        assertNoSolution("zz(X)");
+        // Assert
+        Object awtRectangle = new Rectangle(1, 2, 3, 4);
+        Struct fact1 = new Struct("rectangle", awtRectangle);
+        int index1 = dynamic.assertFact(fact1);
+        assertEquals(0, index1);
+        assertSame(awtRectangle, assertOneSolution("rectangle(X)").binding("X"));
+        assertEquals(new Rectangle(1, 2, 3, 4), assertOneSolution("rectangle(X)").binding("X"));
+        // Retract
+        dynamic.retractFactAt(index1);
+        assertNoSolution("rectangle(X)");
+    }
+
 }
