@@ -167,8 +167,8 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive
     public Continuation atomic(SolutionListener theListener, Bindings theBindings, Object theTerm) {
-        final Bindings b = theBindings.focus(theTerm, Term.class);
-        assertValidBindings(b, "atomic/1");
+        final Bindings b = theBindings.focus(theTerm, Object.class);
+        ensureBindingIsNotAFreeVar(b, "atomic/1");
         final Object effectiveTerm = b.getReferrer();
         if (effectiveTerm instanceof Struct || effectiveTerm instanceof Number) {
             return notifySolution(theListener);
@@ -178,8 +178,8 @@ public class CoreLibrary extends LibraryBase {
 
     @Primitive
     public Continuation number(SolutionListener theListener, Bindings theBindings, Object theTerm) {
-        final Bindings b = theBindings.focus(theTerm, Term.class);
-        assertValidBindings(b, "number/1");
+        final Bindings b = theBindings.focus(theTerm, Object.class);
+        ensureBindingIsNotAFreeVar(b, "number/1");
         final Object effectiveTerm = b.getReferrer();
         if (effectiveTerm instanceof Number) {
             return notifySolution(theListener);
@@ -225,7 +225,7 @@ public class CoreLibrary extends LibraryBase {
     @Primitive
     public Continuation atom_length(SolutionListener theListener, Bindings theBindings, Object theAtom, Object theLength) {
         final Bindings atomBindings = theBindings.focus(theAtom, Object.class);
-        assertValidBindings(atomBindings, "atom_length/2");
+        ensureBindingIsNotAFreeVar(atomBindings, "atom_length/2");
         final Object atom = atomBindings.getReferrer();
         final String atomText = atom.toString();
         final Long atomLength = Long.valueOf((long) atomText.length());
@@ -237,7 +237,7 @@ public class CoreLibrary extends LibraryBase {
     // Surprisingly enough the operator \+ means "not provable".
     public Continuation not(final SolutionListener theListener, Bindings theBindings, Object theGoal) {
         final Bindings subGoalBindings = theBindings.focus(theGoal, Object.class);
-        assertValidBindings(subGoalBindings, "\\+/1");
+        ensureBindingIsNotAFreeVar(subGoalBindings, "\\+/1");
 
         // final Term target = resolveNonVar(theGoal, theBindings, "not");
         final class NegationListener implements SolutionListener {
@@ -263,7 +263,7 @@ public class CoreLibrary extends LibraryBase {
     @Primitive
     public Continuation findall(SolutionListener theListener, final Bindings theBindings, final Object theTemplate, final Object theGoal, final Object theResult) {
         final Bindings subGoalBindings = theBindings.focus(theGoal, Object.class);
-        assertValidBindings(subGoalBindings, "findall/3");
+        ensureBindingIsNotAFreeVar(subGoalBindings, "findall/3");
 
         // Define a listener to collect all solutions for the goal specified
         final ArrayList<Object> javaResults = new ArrayList<Object>(); // Our internal collection of results
@@ -335,7 +335,7 @@ public class CoreLibrary extends LibraryBase {
         if (resolvedBindings.isFreeReferrer()) {
             // thePredicate is still free, going ot match from theList
             resolvedBindings = theBindings.focus(theList, Term.class);
-            assertValidBindings(resolvedBindings, "=../2");
+            ensureBindingIsNotAFreeVar(resolvedBindings, "=../2");
             final Struct lst2 = (Struct) resolvedBindings.getReferrer();
             final Struct flattened = lst2.predicateFromPList();
             final boolean unified = unify(thePredicate, theBindings, flattened, resolvedBindings);

@@ -85,7 +85,7 @@ public class RDBLibrary extends LibraryBase {
         final DataSource ds = bound(theDataSource, theBindings, DataSource.class);
 
         final Bindings expressionBindings = theBindings.focus(theExpression, Struct.class);
-        assertValidBindings(expressionBindings, "select/*");
+        ensureBindingIsNotAFreeVar(expressionBindings, "select/*");
         final Struct conditions = (Struct) expressionBindings.getReferrer();
 
         // Options
@@ -357,7 +357,7 @@ public class RDBLibrary extends LibraryBase {
      */
     private <T> T bound(Object theBinding, Bindings theBindings, Class<T> desiredClassOrInterface) {
         final Bindings b = theBindings.focus(theBinding, Struct.class);
-        assertValidBindings(b, "bound");
+        ensureBindingIsNotAFreeVar(b, "bound");
         final Struct bindingName = (Struct) b.getReferrer();
 
         final Object instance = PojoLibrary.extract(bindingName.getName());

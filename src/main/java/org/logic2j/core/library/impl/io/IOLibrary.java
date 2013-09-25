@@ -61,7 +61,7 @@ public class IOLibrary extends LibraryBase {
     public Continuation log(SolutionListener theListener, Bindings theBindings, Object... terms) {
         for (final Object term : terms) {
             final Bindings b = theBindings.focus(term, Term.class);
-            assertValidBindings(b, "write/*");
+            ensureBindingIsNotAFreeVar(b, "write/*");
             final Object value = b.getReferrer();
 
             String format = getProlog().getTermExchanger().marshall(value).toString();

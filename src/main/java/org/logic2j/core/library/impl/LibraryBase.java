@@ -21,7 +21,7 @@ import org.logic2j.core.api.PLibrary;
 import org.logic2j.core.api.SolutionListener;
 import org.logic2j.core.api.TermAdapter.FactoryMode;
 import org.logic2j.core.api.model.Continuation;
-import org.logic2j.core.api.model.exception.PrologNonSpecificError;
+import org.logic2j.core.api.model.exception.InvalidTermException;
 import org.logic2j.core.api.model.symbol.Struct;
 import org.logic2j.core.api.model.symbol.Var;
 import org.logic2j.core.api.model.var.Binding;
@@ -92,15 +92,16 @@ public class LibraryBase implements PLibrary {
     }
 
     /**
-     * TODO Document me!
+     * Make sure a {@link Bindings} does not have a {@link Bindings#getReferrer()} that is a free {@link Var}.
      * 
      * @param theBindings
-     * @param thePrimitive
+     * @param nameOfPrimitive Non functional - only to report the name of the primitive in case an Exception is thrown
+     * @throws InvalidTermException
      */
-    protected void assertValidBindings(Bindings theBindings, String thePrimitive) {
+    protected void ensureBindingIsNotAFreeVar(Bindings theBindings, String nameOfPrimitive) {
         if (theBindings.isFreeReferrer()) {
             // TODO should be sort of an InvalidGoalException?
-            throw new PrologNonSpecificError("Cannot call primitive " + thePrimitive + " with a free variable goal");
+            throw new InvalidTermException("Cannot call primitive " + nameOfPrimitive + " with a Variable that is free");
         }
     }
 
@@ -128,10 +129,6 @@ public class LibraryBase implements PLibrary {
             theTerm = binding.getTerm();
         }
 
-        // Temporarily for plain Java numbers - but we should anyway return other objects too
-        if (theTerm instanceof Number) {
-            return theTerm;
-        }
         if (theTerm instanceof Struct) {
             final Struct struct = (Struct) theTerm;
             final PrimitiveInfo primInfo = struct.getPrimitiveInfo();
@@ -146,8 +143,7 @@ public class LibraryBase implements PLibrary {
             final Object result = primInfo.invoke(struct, theBindings, /* no listener */null);
             return result;
         }
-        // FIXME shouldn't we return theTerm?
-        return null;
+        return theTerm;
     }
 
     protected Object createConstantTerm(Object anyObject) {
