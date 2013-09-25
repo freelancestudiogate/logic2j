@@ -105,6 +105,7 @@ public class DynamicClauseProviderTest extends PrologTestBase {
         dynamic.assertFact(fact1);
         assertEquals(new Rectangle(1, 2, 3, 4), assertOneSolution("eav(_,_,R)").binding("R"));
         assertEquals(3.0, assertOneSolution("eav(_,_,R), property(R, width, W)").binding("W"));
+        assertOneSolution("eav(_,_,R), property(R, height, 4.0)");
+        assertNoSolution("eav(_,_,R), property(R, height, 3.0)");
     }
-
 }
