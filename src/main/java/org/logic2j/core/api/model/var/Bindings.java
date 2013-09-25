@@ -224,10 +224,11 @@ public class Bindings {
 
     /**
      * Create a new {@link Bindings} with the specified {@link Term} as new Referrer.
-     * When Term is a {@link Var}iable, will follow through bound variables until a free or literal is found.
+     * When Term is a bound {@link Var}iable, will follow through until a free Var or literal is found.
      * 
-     * @param theTerm Must be one of the root or children {@link Term}s that was used to instantiate this {@link Bindings}
-     * @param theClass Of the expected referrer Term
+     * @param theTerm Must be either the root or on of the children {@link Term}s that was
+     *            used to instantiate this {@link Bindings}
+     * @param theClass of the expected referrer Term
      * @return null if theTerm was a free {@link Var}iable
      */
     public Bindings focus(Object theTerm, Class<? extends Object> theClass) {
