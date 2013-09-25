@@ -69,4 +69,11 @@ public class DynamicClauseProvider implements ClauseProvider {
     public void retractFactAt(int theIndex) {
         this.clauses.set(theIndex, null);
     }
+
+    /**
+     * Retract all facts
+     */
+    public void retractAll() {
+        this.clauses.clear();
+    }
 }
