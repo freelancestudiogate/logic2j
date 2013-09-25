@@ -24,8 +24,10 @@ import static org.junit.Assert.assertSame;
 import java.awt.Rectangle;
 import java.util.Arrays;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.logic2j.contrib.library.pojo.PojoLibrary;
 import org.logic2j.core.PrologTestBase;
 import org.logic2j.core.api.model.symbol.Struct;
 
@@ -37,6 +39,12 @@ public class DynamicClauseProviderTest extends PrologTestBase {
     public void init() {
         dynamic = new DynamicClauseProvider(getProlog());
         getProlog().getTheoryManager().addClauseProvider(dynamic);
+        getProlog().getLibraryManager().loadLibrary(new PojoLibrary(getProlog()));
+    }
+
+    @After
+    public void reset() {
+        dynamic.retractAll();
     }
 
     @Test
@@ -79,14 +87,24 @@ public class DynamicClauseProviderTest extends PrologTestBase {
         assertNoSolution("zz(X)");
         // Assert
         Object awtRectangle = new Rectangle(1, 2, 3, 4);
-        Struct fact1 = new Struct("rectangle", awtRectangle);
+        Struct fact1 = new Struct("eav", "context", "shape", awtRectangle);
         int index1 = dynamic.assertFact(fact1);
         assertEquals(0, index1);
-        assertSame(awtRectangle, assertOneSolution("rectangle(X)").binding("X"));
-        assertEquals(new Rectangle(1, 2, 3, 4), assertOneSolution("rectangle(X)").binding("X"));
+        assertSame(awtRectangle, assertOneSolution("eav(_, _, X)").binding("X"));
+        assertEquals(new Rectangle(1, 2, 3, 4), assertOneSolution("eav(_,_,X)").binding("X"));
         // Retract
         dynamic.retractFactAt(index1);
-        assertNoSolution("rectangle(X)");
+        assertNoSolution("eav(_,_,X)");
+    }
+
+    @Test
+    public void assertObjectFactProperties() {
+        // Assert
+        Object awtRectangle = new Rectangle(1, 2, 3, 4);
+        Struct fact1 = new Struct("eav", "context", "shape", awtRectangle);
+        dynamic.assertFact(fact1);
+        assertEquals(new Rectangle(1, 2, 3, 4), assertOneSolution("eav(_,_,R)").binding("R"));
+        assertEquals(3.0, assertOneSolution("eav(_,_,R), property(R, width, W)").binding("W"));
     }
 
 }
