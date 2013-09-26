@@ -40,6 +40,11 @@ public class LibraryBase implements PLibrary {
         this.prolog = theProlog;
     }
 
+    @Override
+    public Object dispatch(String theMethodName, Struct theGoalStruct, Bindings theGoalVars, SolutionListener theListener) {
+        return PLibrary.NO_DIRECT_INVOCATION_USE_REFLECTION;
+    }
+
     /**
      * Convenience shortcut to have the current Prolog engine unifying 2 terms.
      * 

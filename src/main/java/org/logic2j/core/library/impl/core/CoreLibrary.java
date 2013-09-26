@@ -135,6 +135,41 @@ public class CoreLibrary extends LibraryBase {
         super(theProlog);
     }
 
+    @Override
+    public Object dispatch(String theMethodName, Struct theGoalStruct, Bindings theGoalVars, SolutionListener theListener) {
+        final Object result;
+        final int arity = theGoalStruct.getArity();
+        if (arity == 1) {
+            final Object arg0 = theGoalStruct.getArg(0);
+            if (theMethodName == "not") {
+                result = not(theListener, theGoalVars, arg0);
+            } else {
+                result = NO_DIRECT_INVOCATION_USE_REFLECTION;
+            }
+        } else if (arity == 2) {
+            final Object arg0 = theGoalStruct.getArg(0);
+            final Object arg1 = theGoalStruct.getArg(1);
+            if (theMethodName == "unify") {
+                result = unify(theListener, theGoalVars, arg0, arg1);
+            } else if (theMethodName == "expression_greater_equal_than") {
+                result = expression_greater_equal_than(theListener, theGoalVars, arg0, arg1);
+            } else if (theMethodName == "expression_equals") {
+                result = expression_equals(theListener, theGoalVars, arg0, arg1);
+            } else if (theMethodName == "is") {
+                result = is(theListener, theGoalVars, arg0, arg1);
+            } else if (theMethodName == "plus") {
+                result = plus(theListener, theGoalVars, arg0, arg1);
+            } else if (theMethodName == "minus") {
+                result = minus(theListener, theGoalVars, arg0, arg1);
+            } else {
+                result = NO_DIRECT_INVOCATION_USE_REFLECTION;
+            }
+        } else {
+            result = NO_DIRECT_INVOCATION_USE_REFLECTION;
+        }
+        return result;
+    }
+
     @Primitive(name = Struct.FUNCTOR_TRUE)
     // We can't name the method "true" it's a Java reserved word...
     public Continuation trueFunctor(SolutionListener theListener, Bindings theBindings) {
@@ -228,7 +263,7 @@ public class CoreLibrary extends LibraryBase {
         ensureBindingIsNotAFreeVar(atomBindings, "atom_length/2");
         final Object atom = atomBindings.getReferrer();
         final String atomText = atom.toString();
-        final Long atomLength = Long.valueOf((long) atomText.length());
+        final Long atomLength = Long.valueOf(atomText.length());
         final boolean unified = unify(atomLength, atomBindings, theLength, theBindings);
         return notifyIfUnified(unified, theListener);
     }
