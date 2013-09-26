@@ -46,6 +46,9 @@ public class Clause {
      */
     private final Bindings bindings; // Immutable, not null
 
+    private final boolean isFact;
+    private final boolean isWithClauseFunctor;
+
     /**
      * Make a Term (must be a Struct) read for inference, this requires to normalize it.
      * 
@@ -59,6 +62,8 @@ public class Clause {
         // Any Clause must be normalized otherwise we won't be able to infer on it!
         this.content = TermApi.normalize(theClauseTerm, theProlog.getLibraryManager().wholeContent());
         this.bindings = new Bindings(this.content);
+        this.isFact = evaluateIsFact();
+        this.isWithClauseFunctor = evaluateIsWithClauseFunctor();
     }
 
     /**
@@ -75,6 +80,12 @@ public class Clause {
         }
         // Clone the block of variables
         this.bindings = Bindings.deepCopyWithSameReferrer(theOriginal.getBindings());
+        this.isFact = theOriginal.isFact;
+        this.isWithClauseFunctor = theOriginal.isWithClauseFunctor;
+    }
+
+    public boolean isFact() {
+        return this.isFact;
     }
 
     /**
@@ -83,7 +94,7 @@ public class Clause {
      * 
      * @return True if the clause is a fact: if the {@link Struct} does not have ":-" as functor, or if the body is "true".
      */
-    public boolean isFact() {
+    public boolean evaluateIsFact() {
         if (!(this.content instanceof Struct)) {
             return true;
         }
@@ -101,7 +112,7 @@ public class Clause {
         return false;
     }
 
-    private boolean isWithClauseFunctor() {
+    private boolean evaluateIsWithClauseFunctor() {
         if (this.content instanceof String) {
             return false;
         }
@@ -116,7 +127,7 @@ public class Clause {
      * @return The clause's head as a {@link Term}, normally a {@link Struct}.
      */
     public Object getHead() {
-        if (isWithClauseFunctor()) {
+        if (this.isWithClauseFunctor) {
             return ((Struct) this.content).getLHS();
         }
         return this.content;
@@ -126,7 +137,7 @@ public class Clause {
      * @return The clause's body as a {@link Term}, normally a {@link Struct}.
      */
     public Object getBody() {
-        if (isWithClauseFunctor()) {
+        if (this.isWithClauseFunctor) {
             return ((Struct) this.content).getRHS();
         }
         return Struct.ATOM_TRUE;
