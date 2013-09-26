@@ -89,8 +89,8 @@ public class BenchmarkTest extends PrologTestBase {
     @Test
     public void queensForTiming() throws IOException {
         loadTheoryFromTestResourcesDir("queens.pl");
+        final String goal = "queens(11, _)";
         final long startTime = System.currentTimeMillis();
-        String goal = "queens(11, _)";
         assertNSolutions(2680, "queens(11, _)"); // tuProlog (GUI) needs 261s on my machine
         logger.info("Timing for {}: {}", goal, (System.currentTimeMillis() - startTime));
     }
@@ -102,12 +102,15 @@ public class BenchmarkTest extends PrologTestBase {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         while (true) {
+            final String goal = "queens(11, _)";
             System.out.print("Press any key to run, q to quit");
             String readLine = br.readLine();
             if (readLine != null && readLine.startsWith("q")) {
                 break;
             }
-            assertNSolutions(2680, "queens(11, _)"); // tuProlog (GUI) needs 261s on my machine
+            final long startTime = System.currentTimeMillis();
+            assertNSolutions(2680, goal); // tuProlog (GUI) needs 261s on my machine
+            logger.info("Timing for {}: {}", goal, (System.currentTimeMillis() - startTime));
         }
     }
 }
